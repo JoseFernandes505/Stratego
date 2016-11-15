@@ -1,3 +1,5 @@
+//Created by Jose Fernandes
+
 package stratego;
 
 public class BoardData{

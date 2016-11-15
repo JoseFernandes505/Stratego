@@ -1,3 +1,5 @@
+//Created by Jose Fernandes
+
 package stratego;
 import java.awt.Color;
 import java.awt.Graphics;
