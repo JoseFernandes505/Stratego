@@ -88,7 +88,7 @@ public class BoardPanel extends JPanel implements ActionListener{
 		
 		super.paintComponent( g );
 		
-		
+		//Forloop to draw the piece's icons
 		for(int i = 0; i < tileButtons.length; i++){
 			for(int j = 0; j < tileButtons[i].length; j++){
 				
@@ -108,15 +108,19 @@ public class BoardPanel extends JPanel implements ActionListener{
 												
 			}
 		}
+		
+		
 	}
 
 
 
-
+	//Inherited ActionListener function
 	@Override
 	public void actionPerformed(ActionEvent ae) {
+			//Sets X and Y to be the source's X and Y
 			findButtonsTile( (JButton) ae.getSource() );
 			
+			//If there's a token at the location, calls the 
 			if(board.getTile(x, y).getToken() != null){
 				HighlightTiles( board.getTile(x, y).getToken() );
 			}
@@ -132,83 +136,31 @@ public class BoardPanel extends JPanel implements ActionListener{
 			
 			//Checks for available moves on the right
 			if( (x + i + 1) < board.getWidth() ){
-				
-				if( !board.getTile( (x + i + 1), y).isPassable() ){
-					rightMoveBlocked = true;
-				}
-								
-				if(!rightMoveBlocked){
-					if( board.getTile( (x + i + 1), y).getToken() != null ){
-						board.getTile( (x + i + 1), y).setInRange( true );
-						rightMoveBlocked = true;
-					} else {
-						board.getTile( (x + i + 1), y).setInRange( true );
-					}
-					
-				}
-				
+				if(!rightMoveBlocked)
+				rightMoveBlocked = checkDirection(rightMoveBlocked, x + i + 1, y);				
 			}
 			
 			//Checks for available moves on the left
 			if(x - i - 1 >= 0){
-				
-				if( !board.getTile(x - i - 1, y).isPassable() ){
-					leftMoveBlocked = true;
-				}
-				
-				if(!leftMoveBlocked){
-					if(board.getTile(x - i - 1, y).getToken() != null){
-						board.getTile(x - i - 1, y).setInRange(true);
-						leftMoveBlocked = true;
-					} else {
-						board.getTile( (x - i - 1), y).setInRange( true );
-					}					
-					
-				}
-				
+				if(!leftMoveBlocked)
+					leftMoveBlocked = checkDirection(leftMoveBlocked, x - i - 1, y);
 			}
 			
 			//Checks for available moves above
 			if(y + i + 1 < board.getHeight() ){
-				
-				if( !board.getTile(x , y + i + 1).isPassable() ){
-					upMoveBlocked = true;
-				}
-				
-				if(!upMoveBlocked){
-					if(board.getTile(x , y + i + 1).getToken() != null){
-						board.getTile(x , y + i + 1).setInRange(true);
-						upMoveBlocked = true;
-					} else {
-						board.getTile(x , y + i + 1).setInRange( true );
-					}					
-					
-				}
-				
+				if(!upMoveBlocked)
+					upMoveBlocked = checkDirection(upMoveBlocked, x , y + i + 1);	
 			}
 			
 			//Checks for available moves below
 			if(y - i - 1 >= 0 ){
-				
-				if( !board.getTile( x, (y - i - 1)).isPassable() ){
-					downMoveBlocked = true;
-				}
-				
-				if(!downMoveBlocked){
-					if(board.getTile( x, (y - i - 1)).getToken() != null){
-						board.getTile( x, (y - i - 1)).setInRange(true);
-						downMoveBlocked = true;
-					} else {
-						board.getTile( x, (y - i - 1)).setInRange( true );
-					}					
-					
-				}
-				
+				if(!downMoveBlocked)
+					downMoveBlocked = checkDirection(downMoveBlocked, x , y - i - 1);				
 			}
 			
 		}
 		
-		
+		//Changes the background of all the tiles within range
 		for(int i = 0; i < tileButtons.length; i++){
 			for(int j = 0; j < tileButtons[i].length; j++){
 				
@@ -218,6 +170,25 @@ public class BoardPanel extends JPanel implements ActionListener{
 			}
 		}
 	}
+	
+	public boolean checkDirection(boolean direction, int x, int y){
+		if( !board.getTile( x, y).isPassable() ){
+			return true;
+		}
+						
+		if(!direction){
+			if( board.getTile( x, y).getToken() != null ){
+				board.getTile( x, y).setInRange( true );
+				return true;
+			} else {
+				board.getTile( x, y).setInRange( true );
+			}
+			
+		}
+		
+		return false;
+	}
+	
 	
 	//Clears the panel backgrounds, and makes everything not in range
 	public void clearBoardBackground(){
