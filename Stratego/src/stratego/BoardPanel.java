@@ -26,9 +26,6 @@ public class BoardPanel extends JPanel implements ActionListener{
 	private GridLayout gridLayout; 
 	//board object, contains all the board data
 	private BoardData board;
-	//Holder X and Y ints, get the position of a button in tileButtons[x][y] and allow 
-	//for the tile in the boarddata object to be found
-	private int x = 0, y = 0;
 	
 	public BoardPanel(BoardData b){
 		//sets the board as a passed in board
@@ -62,38 +59,52 @@ public class BoardPanel extends JPanel implements ActionListener{
 		
 		}
 		
+		//Sets the icons for all the tiles
+		setAllIcons();
+		
 	}
 	
 	
 	//Function to find the position of a button in the buttonarray in terms of X and Y
-	public void findButtonsTile(JButton button){
+	public int findButtonsX(JButton button){
 		
 		//Searches the array until the button is found, then sets the holder variables as the current i and j
 		for(int i = 0; i < tileButtons.length; i++){	
 			for(int j = 0; j < tileButtons[i].length; j++){
 				if( tileButtons[i][j] == button ){
-					x = i;
-					y = j;
-					return;
+					return i;
 				}
 			}
-		
 		}
+		//If not available
+		return -1;
+	}
+	
+	//Takes an inputted X from the previous findButtonsX function, and finds the Y from that
+	public int findButtonsY(JButton button, int x){	
+		
+		//Searches the array until the button is found, then sets the holder variable as the current i
+		for(int i = 0; i < tileButtons[x].length; i++){
+			if( tileButtons[x][i] == button ){
+					return i;
+			}
+		}
+		//If not available
+		return -1;
 	}
 	
 	
+	
 	//Paint component of the board
-	@Override
-	public void paintComponent(Graphics g){
-		
-		super.paintComponent( g );
+	public void setAllIcons(){
 		
 		//Forloop to draw the piece's icons
 		for(int i = 0; i < tileButtons.length; i++){
 			for(int j = 0; j < tileButtons[i].length; j++){
 				
 				//Sets the holder X and Y to be the button's X and Y
-				findButtonsTile(tileButtons[i][j]);
+				int x = findButtonsX(tileButtons[i][j]);
+				int y = findButtonsY(tileButtons[i][j], x);
 				
 				//If the corresponding tile has a token
 				if( board.getTile(x, y).getToken() != null ){
@@ -104,11 +115,12 @@ public class BoardPanel extends JPanel implements ActionListener{
 					//Sets the button's icon to be that imageicon
 					tileButtons[i][j].setIcon(icon);
 					
+				} else {
+					tileButtons[i][j].setIcon(null);
 				}
 												
 			}
 		}
-		
 		
 	}
 
@@ -118,15 +130,21 @@ public class BoardPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 			//Sets X and Y to be the source's X and Y
-			findButtonsTile( (JButton) ae.getSource() );
+			int x = findButtonsX( (JButton) ae.getSource() );
+			int y = findButtonsY( (JButton) ae.getSource(), x );
 			
 			//If there's a token at the location, calls the 
 			if(board.getTile(x, y).getToken() != null){
-				HighlightTiles( board.getTile(x, y).getToken() );
+				HighlightTiles( board.getTile(x, y).getToken(), x, y );
+			}
+			
+			if(board.getTile(x, y).inRange()){
+				MoveToken();
 			}
 	}
 	
-	public void HighlightTiles(Token tok){
+	//Highlights the tiles in moveable range of a token
+	public void HighlightTiles(Token tok, int x, int y){
 		int range = tok.getRange();
 		boolean leftMoveBlocked = false, rightMoveBlocked = false, upMoveBlocked = false, downMoveBlocked = false;
 		
@@ -137,25 +155,25 @@ public class BoardPanel extends JPanel implements ActionListener{
 			//Checks for available moves on the right
 			if( (x + i + 1) < board.getWidth() ){
 				if(!rightMoveBlocked)
-				rightMoveBlocked = checkDirection(rightMoveBlocked, x + i + 1, y);				
+				rightMoveBlocked = checkDirection(rightMoveBlocked, x + i + 1, y, tok.getTeam());				
 			}
 			
 			//Checks for available moves on the left
 			if(x - i - 1 >= 0){
 				if(!leftMoveBlocked)
-					leftMoveBlocked = checkDirection(leftMoveBlocked, x - i - 1, y);
+					leftMoveBlocked = checkDirection(leftMoveBlocked, x - i - 1, y, tok.getTeam());
 			}
 			
 			//Checks for available moves above
 			if(y + i + 1 < board.getHeight() ){
 				if(!upMoveBlocked)
-					upMoveBlocked = checkDirection(upMoveBlocked, x , y + i + 1);	
+					upMoveBlocked = checkDirection(upMoveBlocked, x , y + i + 1, tok.getTeam());	
 			}
 			
 			//Checks for available moves below
 			if(y - i - 1 >= 0 ){
 				if(!downMoveBlocked)
-					downMoveBlocked = checkDirection(downMoveBlocked, x , y - i - 1);				
+					downMoveBlocked = checkDirection(downMoveBlocked, x , y - i - 1, tok.getTeam());				
 			}
 			
 		}
@@ -171,22 +189,40 @@ public class BoardPanel extends JPanel implements ActionListener{
 		}
 	}
 	
-	public boolean checkDirection(boolean direction, int x, int y){
+	//Function to be used within the HighlightTiles function
+	public boolean checkDirection(boolean direction, int x, int y, boolean tokenTeam){
+		//Checks if the tile is passable, if not, returns that it's blocked
 		if( !board.getTile( x, y).isPassable() ){
 			return true;
 		}
 						
-		if(!direction){
+		//If it still isn't blocked,checks if there is a token on the tile
+		if(!direction && board.getTile( x, y).isPassable()){
+			//If there's a token, sets that one token in range but then sets its motion
+			//as blocked so it does not continue
 			if( board.getTile( x, y).getToken() != null ){
-				board.getTile( x, y).setInRange( true );
+				if( board.getTile(x, y).getToken().getTeam() == tokenTeam){
+					board.getTile( x, y).setInRange( false );
+				} else if( board.getTile(x, y).getToken().getTeam() != tokenTeam) {
+					board.getTile( x, y).setInRange( true );
+				}
+				
 				return true;
+			//Otherwise the tile is simply set in range
 			} else {
 				board.getTile( x, y).setInRange( true );
 			}
 			
 		}
 		
+		//If none of the things returned that it is blocked, return that it isn't
 		return false;
+	}
+	
+	
+	//TODO
+	public void MoveToken(){
+		
 	}
 	
 	

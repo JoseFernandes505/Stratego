@@ -8,7 +8,6 @@ public class Token{
 	private String tokenName;
 	private String iconPath;
 	private int tokenNum;
-	private Color teamColor;
 	private boolean teamBool;
 	int movementRange = 1;
 	
@@ -16,8 +15,7 @@ public class Token{
 	public Token(String name, int num, boolean team){
 		tokenName = name;
 		tokenNum = num;
-		teamBool = team;
-		teamColor = (team ? Color.RED : Color.BLUE);
+		teamBool = team;			//True = red, False = blue
 		iconPath = tokenNum + "_" + tokenName + "_" + (team ? "red" : "blue");
 	}
 	
@@ -40,11 +38,6 @@ public class Token{
 	//Returns the range of the token
 	public int getRange(){
 		return movementRange;
-	}
-	
-	//Returns the color of the tile
-	public Color getColor(){
-		return teamColor;
 	}
 	
 	//Returns a boolean based on the team color (Red == true, Blue == false)
