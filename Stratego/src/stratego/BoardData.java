@@ -6,6 +6,13 @@ import java.awt.Color;
 import java.util.List;
 
 public class BoardData{
+	
+	/*
+	 * 
+	 * 		VARIABLES
+	 * 
+	 */
+	
 	//Board array
 	private Tile[][] board;
 	
@@ -30,10 +37,17 @@ public class BoardData{
 	private int scoutNum = 8;
 	private int spyNum = 1;
 	
+	/*
+	 * 
+	 * 		CONSTRUCTOR & INITIALIZER FUNCTION
+	 * 
+	 */
+	
 	public BoardData(){
 		board = new Tile[width][height];
 		buildBoard();
 	}
+	
 	
 	public void buildBoard(){
 		
@@ -61,154 +75,13 @@ public class BoardData{
 		
 	}
 	
-	//Returns the width of the board
-	public int getWidth(){
-		return width;
-	}
+	/*
+	 * 
+	 * 		BOARD DATA MODIFICATION
+	 * 
+	 */
 	
-	//Returns the height of the board
-	public int getHeight(){
-		return height;
-	}
-	
-	//Returns any one specific tile
-	public Tile getTile(int x, int y){
-		return board[x][y];
-	}
-	
-	//Populates the board with a lot of test values
-	public void populateTestBoard(){
-		
-		for(int i = 0; i < width; i++){
-			for(int j = 0; j < height; j++){
-				
-				if(i < 4 ){
-					board[i][j].addToken( new Token("lieutenant", 5, false) );
-				}
-				
-				if(i > 5 ){
-					board[i][j].addToken( new Token("lieutenant", 5, true) );
-				}
-				
-			}
-		}
-		
-		board[4][4].addToken( new Token("scout", 2, true, 10) );
-		board[4][5].addToken( new Token("scout", 2, false, 10) );
-		
-	}
-	
-	//Initializes the list of initial tokens, to be placed on the board
-	public void initializeList(boolean color){
-		
-		for(int i = 0; i < flagNum; i++ ){
-			initialTokens.add( new Token("flag", 0, color, 0) );
-		}
-		
-		for(int i = 0; i < bombNum; i++ ){
-			initialTokens.add( new Token("bomb", 11, color, 0) );
-		}
-		
-		for(int i = 0; i < marshalNum; i++ ){
-			initialTokens.add( new Token("marshal", 10, color) );
-		}
-		
-		for(int i = 0; i < generalNum; i++ ){
-			initialTokens.add( new Token("general", 9, color) );
-		}
-		
-		for(int i = 0; i < colonelNum; i++ ){
-			initialTokens.add( new Token("colonel", 8, color) );
-		}
-		
-		for(int i = 0; i < majorNum; i++ ){
-			initialTokens.add( new Token("major", 7, color) );
-		}
-		
-		for(int i = 0; i < captainNum; i++ ){
-			initialTokens.add( new Token("captain", 6, color) );
-		}
-		
-		for(int i = 0; i < lieutenantNum; i++ ){
-			initialTokens.add( new Token("lieutenant", 5, color) );
-		}
-		
-		for(int i = 0; i < sergeantNum; i++ ){
-			initialTokens.add( new Token("sergeant", 4, color) );
-		}
-		
-		for(int i = 0; i < minerNum; i++ ){
-			initialTokens.add( new Token("miner", 3, color) );
-		}
-		
-		for(int i = 0; i < scoutNum; i++ ){
-			initialTokens.add( new Token("scout", 2, color, (width > height ? width : height)) );
-		}
-		
-		for(int i = 0; i < spyNum; i++ ){
-			initialTokens.add( new Token("spy", 1, color) );
-		}
-	}
-	
-	//Sets a token of an inputted rank and team at an X and Y position
-	public boolean setToken(int rank, boolean color, int xpos, int ypos){
-		
-		//Makes sure that the x and y inputs are both within range
-		if(xpos >= width || xpos < 0){
-			return false;
-		}
-		if(ypos >= height || ypos < 0){
-			return false;
-		}
-		
-		//Makes sure that the tile does not already have a token
-		if(board[xpos][ypos] != null){
-			return false;
-		} 
-		
-		//Switch statement to set the position as a token of the inputted rank/color
-		switch(rank){
-			case 0:
-				board[xpos][ypos].addToken( new Token("flag", rank, color) );
-				return true;
-			case 1:
-				board[xpos][ypos].addToken( new Token("spy", rank, color) );
-				return true;
-			case 2:
-				board[xpos][ypos].addToken( new Token("scout", rank, color) );
-				return true;
-			case 3:
-				board[xpos][ypos].addToken( new Token("miner", rank, color) );
-				return true;
-			case 4:
-				board[xpos][ypos].addToken( new Token("sergeant", rank, color) );
-				return true;
-			case 5:
-				board[xpos][ypos].addToken( new Token("lieutenant", rank, color) );
-				return true;
-			case 6:
-				board[xpos][ypos].addToken( new Token("captain", rank, color) );
-				return true;
-			case 7:
-				board[xpos][ypos].addToken( new Token("major", rank, color) );
-				return true;
-			case 8:
-				board[xpos][ypos].addToken( new Token("colonel", rank, color) );
-				return true;
-			case 9:
-				board[xpos][ypos].addToken( new Token("general", rank, color) );
-				return true;
-			case 10:
-				board[xpos][ypos].addToken( new Token("marshal", rank, color) );
-				return true;
-			case 11:
-				board[xpos][ypos].addToken( new Token("bomb", rank, color) );
-				return true;
-			default:
-				return false;			
-		}
-	}
-	
+	//Moves the token on the board
 	public boolean moveToken(int toX, int toY){
 		//Holder for the x,y coordinates of the token
 		int fromX = -1, fromY = -1;
@@ -274,10 +147,9 @@ public class BoardData{
 					downMoveBlocked = checkDirection(downMoveBlocked, x , y - i - 1, tok.getTeam());				
 			}
 		}
-		
-
 	}
 	
+	//Checks if the current tile should be in range of a specific set of parameters
 	public boolean checkDirection(boolean direction, int x, int y, boolean tokenTeam){
 		//Checks if the tile is passable, if not, returns that it's blocked
 		if( !getTile( x, y).isPassable() ){
@@ -307,6 +179,129 @@ public class BoardData{
 		return false;
 	}
 	
+	public void doBattle( int defX, int defY ){
+		
+		int attX = -1, attY = -1;
+		
+		//Forloop to see which piece is the one that's currently moving
+		for(int i = 0; i < width; i++){
+			for(int j = 0; j< height; j++){
+				//If the piece has a token, and it is currently moving, then it is set to be the move token
+				if(getTile(i, j).getToken() != null && getTile(i, j).getToken().isMoving()){
+					attX = i;
+					attY = j;
+				}
+					
+			}
+		}
+		
+		//Checks that the from values were changed
+		if(attX == -1 && attY == -1) {
+			clearBoardData();
+			return;
+		}
+		
+		
+		
+		int result = getTile(attX, attY).getToken().doBattle( getTile(defX, defY).getToken() );
+		
+		if( result > 0 ) {
+			getTile(defX, defY).removeToken();
+			getTile(defX, defY).addToken( getTile(attX, attY).getToken() );
+			getTile(attX, attY).removeToken();
+			
+		} else if ( result < 0 ) {
+			getTile(attX, attY).removeToken();
+		} else if ( result == 0 ) {
+			getTile(attX, attY).removeToken();
+			getTile(defX, defY).removeToken();
+		}
+		
+		clearBoardData();
+	}
+	
+	//Initializes the list of initial tokens, to be placed on the board
+	public void initializeList(boolean color){
+		
+		for(int i = 0; i < flagNum; i++ ){
+			initialTokens.add( new Token("flag", 0, color, 0) );
+		}
+		
+		for(int i = 0; i < bombNum; i++ ){
+			initialTokens.add( new Token("bomb", 11, color, 0) );
+		}
+		
+		for(int i = 0; i < marshalNum; i++ ){
+			initialTokens.add( new Token("marshal", 10, color) );
+		}
+		
+		for(int i = 0; i < generalNum; i++ ){
+			initialTokens.add( new Token("general", 9, color) );
+		}
+		
+		for(int i = 0; i < colonelNum; i++ ){
+			initialTokens.add( new Token("colonel", 8, color) );
+		}
+		
+		for(int i = 0; i < majorNum; i++ ){
+			initialTokens.add( new Token("major", 7, color) );
+		}
+		
+		for(int i = 0; i < captainNum; i++ ){
+			initialTokens.add( new Token("captain", 6, color) );
+		}
+		
+		for(int i = 0; i < lieutenantNum; i++ ){
+			initialTokens.add( new Token("lieutenant", 5, color) );
+		}
+		
+		for(int i = 0; i < sergeantNum; i++ ){
+			initialTokens.add( new Token("sergeant", 4, color) );
+		}
+		
+		for(int i = 0; i < minerNum; i++ ){
+			initialTokens.add( new Token("miner", 3, color) );
+		}
+		
+		for(int i = 0; i < scoutNum; i++ ){
+			initialTokens.add( new Token("scout", 2, color, (width > height ? width : height)) );
+		}
+		
+		for(int i = 0; i < spyNum; i++ ){
+			initialTokens.add( new Token("spy", 1, color) );
+		}
+	}
+
+	
+	/*
+	 * 
+	 * 		HELPER FUNCTIONS
+	 * 
+	 */
+	
+	//Populates the board with a lot of test values
+	public void populateTestBoard(){
+		
+		for(int i = 0; i < width; i++){
+			for(int j = 0; j < height; j++){
+				
+				if(i < 4 ){
+					board[i][j].addToken( new Token("lieutenant", 5, false) );
+				}
+				
+				if(i > 5 ){
+					board[i][j].addToken( new Token("lieutenant", 5, true) );
+				}
+				
+			}
+		}
+		
+		board[4][4].addToken( new Token("scout", 2, true, 10) );
+		board[4][5].addToken( new Token("scout", 2, false, 10) );
+		
+	}
+	
+	//Clears the board's range and movement data
 	public void clearBoardData(){
 		for(int i = 0; i < width; i++){
 			for(int j = 0; j < height; j++){
@@ -321,5 +316,96 @@ public class BoardData{
 			}
 		}
 	}
+	
+	/*
+	 * 
+	 * 		GETTERS/SETTERS
+	 * 
+	 */
+	
+	//Returns the width of the board
+	public int getWidth(){
+		return width;
+	}
+	
+	//Returns the height of the board
+	public int getHeight(){
+		return height;
+	}
+	
+	//Returns any one specific tile
+	public Tile getTile(int x, int y){
+		return board[x][y];
+	}
+	
+	
+	
+	
+	/*
+	//Sets a token of an inputted rank and team at an X and Y position
+	public boolean setToken(int rank, boolean color, int xpos, int ypos){
+		
+		//Makes sure that the x and y inputs are both within range
+		if(xpos >= width || xpos < 0){
+			return false;
+		}
+		if(ypos >= height || ypos < 0){
+			return false;
+		}
+		
+		//Makes sure that the tile does not already have a token
+		if(board[xpos][ypos] != null){
+			return false;
+		} 
+		
+		//Switch statement to set the position as a token of the inputted rank/color
+		switch(rank){
+			case 0:
+				board[xpos][ypos].addToken( new Token("flag", rank, color) );
+				return true;
+			case 1:
+				board[xpos][ypos].addToken( new Token("spy", rank, color) );
+				return true;
+			case 2:
+				board[xpos][ypos].addToken( new Token("scout", rank, color) );
+				return true;
+			case 3:
+				board[xpos][ypos].addToken( new Token("miner", rank, color) );
+				return true;
+			case 4:
+				board[xpos][ypos].addToken( new Token("sergeant", rank, color) );
+				return true;
+			case 5:
+				board[xpos][ypos].addToken( new Token("lieutenant", rank, color) );
+				return true;
+			case 6:
+				board[xpos][ypos].addToken( new Token("captain", rank, color) );
+				return true;
+			case 7:
+				board[xpos][ypos].addToken( new Token("major", rank, color) );
+				return true;
+			case 8:
+				board[xpos][ypos].addToken( new Token("colonel", rank, color) );
+				return true;
+			case 9:
+				board[xpos][ypos].addToken( new Token("general", rank, color) );
+				return true;
+			case 10:
+				board[xpos][ypos].addToken( new Token("marshal", rank, color) );
+				return true;
+			case 11:
+				board[xpos][ypos].addToken( new Token("bomb", rank, color) );
+				return true;
+			default:
+				return false;			
+		}
+		
+	}
+	
+	*/
+	
+	
+	
+	
 
 }

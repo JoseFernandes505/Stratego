@@ -86,14 +86,17 @@ public class BoardPanel extends JPanel implements ActionListener{
 		
 		//If there's a token at the location, calls the 
 		if( board.getTile(x, y).getToken() != null && board.getTile(x, y).getToken().isMoving() ){
-			board.getTile(x, y).getToken().stopMoving();
 			clearBoardBackground();
+			board.clearBoardData();
+		} else if( 	board.getTile(x, y).getToken() != null && !board.getTile(x, y).getToken().isMoving() &&	board.getTile(x, y).inRange()){
+			doBattle(x, y);
 		} else if(board.getTile(x, y).getToken() != null){
 			HighlightTiles( board.getTile(x, y).getToken(), x, y );
 		} else if(board.getTile(x, y).inRange()){
 			MoveToken(x, y);
-		} else if( 	!board.getTile(x, y).inRange() && board.getTile(x, y).getToken() == null ){
+		} else if( !board.getTile(x, y).inRange() && board.getTile(x, y).getToken() == null ){
 			clearBoardBackground();
+			board.clearBoardData();
 		}
 	}
 	
@@ -128,6 +131,13 @@ public class BoardPanel extends JPanel implements ActionListener{
 		board.moveToken(toX, toY);
 		
 		//Clears the board's backgrounds from the highlighted tiles and updates the icons
+		clearBoardBackground();
+		setAllIcons();
+	}
+	
+	public void doBattle(int defX, int defY){
+		board.doBattle(defX, defY);
+		
 		clearBoardBackground();
 		setAllIcons();
 	}

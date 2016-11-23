@@ -63,15 +63,17 @@ public class Token{
 	}
 	
 	public int doBattle(Token t){
-		
+
+		//If a Miner battles a mine, the Miner wins
 		if(rank == 3 && t.getRank() == 11){
 			return 1;
 		}
+		//If a Spy battles a marshal, the spy wins
+		if(rank == 1 && t.getRank() == 10){
+			return 1;
+		}
 		
-		//if(rank == 1 && )
-		
-		
-		
-		return -1;
+		return rank - t.getRank();
+
 	}
 }
