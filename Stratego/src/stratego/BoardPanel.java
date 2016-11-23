@@ -26,6 +26,8 @@ public class BoardPanel extends JPanel implements ActionListener{
 	private GridLayout gridLayout; 
 	//board object, contains all the board data
 	private BoardData board;
+	//simple enum to say who's turn it is
+	private turnState turn = turnState.NONE;
 	
 	public BoardPanel(BoardData b){
 		//sets the board as a passed in board
@@ -95,7 +97,7 @@ public class BoardPanel extends JPanel implements ActionListener{
 	
 	
 	
-	//Paint component of the board
+	//Sets the icons of the board to be the appropriate icons
 	public void setAllIcons(){
 		
 		//Forloop to draw the piece's icons
@@ -247,5 +249,11 @@ public class BoardPanel extends JPanel implements ActionListener{
 		
 	}
 	
+	
+	private enum turnState{
+		RED,
+		BLUE,
+		NONE
+	}
 	
 }

@@ -16,7 +16,7 @@ public class Token{
 		tokenName = name;
 		tokenNum = num;
 		teamBool = team;			//True = red, False = blue
-		iconPath = tokenNum + "_" + tokenName + "_" + (team ? "red" : "blue");
+		iconPath = tokenNum + "_" + tokenName + "_" + (team ? "blue" : "red");
 	}
 	
 	//Constructor for bombs and scouts, changes the movement range
