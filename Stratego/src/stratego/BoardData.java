@@ -2,16 +2,20 @@
 
 package stratego;
 
+import java.awt.Color;
 import java.util.List;
 
 public class BoardData{
 	//Board array
 	private Tile[][] board;
+	
 	//A list of all the inital token values
 	public List<Token> initialTokens;
+	
 	//Width and height of board
 	private int width = 10;
 	private int height = 10;
+	
 	//Number of each token	
 	private int bombNum = 6;
 	private int flagNum = 1;
@@ -57,18 +61,22 @@ public class BoardData{
 		
 	}
 	
+	//Returns the width of the board
 	public int getWidth(){
 		return width;
 	}
 	
+	//Returns the height of the board
 	public int getHeight(){
 		return height;
 	}
 	
+	//Returns any one specific tile
 	public Tile getTile(int x, int y){
 		return board[x][y];
 	}
 	
+	//Populates the board with a lot of test values
 	public void populateTestBoard(){
 		
 		for(int i = 0; i < width; i++){
@@ -94,11 +102,11 @@ public class BoardData{
 	public void initializeList(boolean color){
 		
 		for(int i = 0; i < flagNum; i++ ){
-			initialTokens.add( new Token("flag", 0, color) );
+			initialTokens.add( new Token("flag", 0, color, 0) );
 		}
 		
 		for(int i = 0; i < bombNum; i++ ){
-			initialTokens.add( new Token("bomb", 11, color) );
+			initialTokens.add( new Token("bomb", 11, color, 0) );
 		}
 		
 		for(int i = 0; i < marshalNum; i++ ){
@@ -134,7 +142,7 @@ public class BoardData{
 		}
 		
 		for(int i = 0; i < scoutNum; i++ ){
-			initialTokens.add( new Token("scout", 2, color) );
+			initialTokens.add( new Token("scout", 2, color, (width > height ? width : height)) );
 		}
 		
 		for(int i = 0; i < spyNum; i++ ){
@@ -198,6 +206,119 @@ public class BoardData{
 				return true;
 			default:
 				return false;			
+		}
+	}
+	
+	public boolean moveToken(int toX, int toY){
+		//Holder for the x,y coordinates of the token
+		int fromX = -1, fromY = -1;
+				
+		//Forloop to see which piece is the one that's currently moving
+		for(int i = 0; i < width; i++){
+			for(int j = 0; j< height; j++){
+				//If the piece has a token, and it is currently moving, then it is set to be the move token
+				if(getTile(i, j).getToken() != null && getTile(i, j).getToken().isMoving()){
+					fromX = i;
+					fromY = j;
+				}
+					
+			}
+		}
+		
+		//Checks that the from values were changed
+		if(fromX == -1 && fromY == -1) {
+			return false;
+		}
+		
+		//Sets the tile to the token which is moving and removes the token from the original tile
+		getTile(toX, toY).addToken( getTile(fromX, fromY).getToken() );
+		getTile(fromX, fromY).removeToken();
+		
+		//Clears the board's passable/moving data
+		clearBoardData();
+		
+		return true;
+	}
+	
+	//Highlights the tiles in moveable range of a token
+	public void setTilesPassable(Token tok, int x, int y){
+		
+		clearBoardData();
+		
+		tok.startMoving();
+		
+		//Gets the range of the token
+		int range = tok.getRange();
+		boolean leftMoveBlocked = false, rightMoveBlocked = false, upMoveBlocked = false, downMoveBlocked = false;
+		
+		//Checks for available moves 
+		for(int i = 0; i < range; i++){
+			//Checks for available moves on the right
+			if( (x + i + 1) < width ){
+				if(!rightMoveBlocked)
+					rightMoveBlocked = checkDirection(rightMoveBlocked, x + i + 1, y, tok.getTeam());				
+			}
+			//Checks for available moves on the left
+			if(x - i - 1 >= 0){
+				if(!leftMoveBlocked)
+					leftMoveBlocked = checkDirection(leftMoveBlocked, x - i - 1, y, tok.getTeam());
+			}
+			//Checks for available moves above
+			if(y + i + 1 < height ){
+				if(!upMoveBlocked)
+					upMoveBlocked = checkDirection(upMoveBlocked, x , y + i + 1, tok.getTeam());	
+			}
+			//Checks for available moves below
+			if(y - i - 1 >= 0 ){
+				if(!downMoveBlocked)
+					downMoveBlocked = checkDirection(downMoveBlocked, x , y - i - 1, tok.getTeam());				
+			}
+		}
+		
+
+	}
+	
+	public boolean checkDirection(boolean direction, int x, int y, boolean tokenTeam){
+		//Checks if the tile is passable, if not, returns that it's blocked
+		if( !getTile( x, y).isPassable() ){
+			return true;
+		}
+						
+		//If it still isn't blocked,checks if there is a token on the tile
+		if(!direction && getTile( x, y).isPassable()){
+			//If there's a token, sets that one token in range but then sets its motion
+			//as blocked so it does not continue
+			if( getTile( x, y).getToken() != null ){
+				if( getTile(x, y).getToken().getTeam() == tokenTeam){
+					getTile( x, y).setInRange( false );
+				} else if( getTile(x, y).getToken().getTeam() != tokenTeam) {
+					getTile( x, y).setInRange( true );
+				}
+				return true;
+			
+			//Otherwise the tile is simply set in range
+			} else {
+				getTile( x, y).setInRange( true );
+			}
+			
+		}
+		
+		//If none of the things returned that it is blocked, return that it isn't
+		return false;
+	}
+	
+	public void clearBoardData(){
+		for(int i = 0; i < width; i++){
+			for(int j = 0; j < height; j++){
+								
+				//Sets all tiles to out of range
+				getTile(i, j).setInRange(false);
+				
+				//Sets all tokens to stop moving
+				if(getTile(i, j).getToken() != null){
+					getTile(i, j).getToken().stopMoving();
+				}
+			}
 		}
 	}
 
