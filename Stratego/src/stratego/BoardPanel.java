@@ -24,8 +24,7 @@ public class BoardPanel extends JPanel implements ActionListener{
 	private GridLayout gridLayout; 
 	//board object, contains all the board data
 	private BoardData board;
-	//simple enum to say who's turn it is
-	private turnState turn = turnState.NONE;
+
 	
 	
 	/*
@@ -84,16 +83,18 @@ public class BoardPanel extends JPanel implements ActionListener{
 		int x = findButtonsX( (JButton) ae.getSource() );
 		int y = findButtonsY( (JButton) ae.getSource(), x );
 		
-		//If there's a token at the location, calls the 
+		
 		if( board.getTile(x, y).getToken() != null && board.getTile(x, y).getToken().isMoving() ){
 			clearBoardBackground();
 			board.clearBoardData();
 		} else if( 	board.getTile(x, y).getToken() != null && !board.getTile(x, y).getToken().isMoving() &&	board.getTile(x, y).inRange()){
 			doBattle(x, y);
-		} else if(board.getTile(x, y).getToken() != null){
+			switchTurn();
+		} else if(	board.getTile(x, y).getToken() != null && board.getTile(x, y).getToken().getTeam() == board.getTurn()){
 			HighlightTiles( board.getTile(x, y).getToken(), x, y );
-		} else if(board.getTile(x, y).inRange()){
+		} else if(	board.getTile(x, y).inRange()){
 			MoveToken(x, y);
+			switchTurn();
 		} else if( !board.getTile(x, y).inRange() && board.getTile(x, y).getToken() == null ){
 			clearBoardBackground();
 			board.clearBoardData();
@@ -141,6 +142,13 @@ public class BoardPanel extends JPanel implements ActionListener{
 		clearBoardBackground();
 		setAllIcons();
 	}
+	
+	public void switchTurn(){
+		board.switchTurn();
+		board.clearBoardData();
+		clearBoardBackground();
+		setAllIcons();
+	}
 		
 	
 	/*
@@ -160,18 +168,21 @@ public class BoardPanel extends JPanel implements ActionListener{
 				int x = findButtonsX(tileButtons[i][j]);
 				int y = findButtonsY(tileButtons[i][j], x);
 				
+				ImageIcon icon = null;
+				
 				//If the corresponding tile has a token
 				if( board.getTile(x, y).getToken() != null ){
+					if( board.getTile(x, y).getToken().getTeam() == board.getTurn() ){
+						//Creates an imageicon of the tile's pathname
+						icon = new ImageIcon( this.getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getPathname() + ".png" ) );
+					} else if( board.getTile(x, y).getToken().getTeam() != board.getTurn() ){
+						//Creates an imageicon of the tile's team bg
+						icon = new ImageIcon( this.getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getBgPathname() + ".png" ) );
+					}
 					
-					//Creates an imageicon of the tile's pathname
-					ImageIcon icon = new ImageIcon( this.getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getPathname() + ".png" ) );
-
-					//Sets the button's icon to be that imageicon
-					tileButtons[i][j].setIcon(icon);
-					
-				} else {
-					tileButtons[i][j].setIcon(null);
 				}
+				
+				tileButtons[i][j].setIcon( icon );
 												
 			}
 		}
@@ -222,13 +233,6 @@ public class BoardPanel extends JPanel implements ActionListener{
 		}
 		//If not available
 		return -1;
-	}
-	
-	//Small enum to define who's turn it is
-	private enum turnState{
-		RED,
-		BLUE,
-		NONE
 	}
 	
 }

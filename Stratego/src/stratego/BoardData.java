@@ -16,12 +16,16 @@ public class BoardData{
 	//Board array
 	private Tile[][] board;
 	
+	
 	//A list of all the inital token values
 	public List<Token> initialTokens;
 	
 	//Width and height of board
 	private int width = 10;
 	private int height = 10;
+	
+	//boolean to decribe turn
+	private boolean turn = true;
 	
 	//Number of each token	
 	private int bombNum = 6;
@@ -220,6 +224,12 @@ public class BoardData{
 		clearBoardData();
 	}
 	
+	//Switches the turn
+	public void switchTurn(){
+		turn = !turn;		
+	}
+	
+	
 	//Initializes the list of initial tokens, to be placed on the board
 	public void initializeList(boolean color){
 		
@@ -296,8 +306,11 @@ public class BoardData{
 			}
 		}
 		
-		board[4][4].addToken( new Token("scout", 2, true, 10) );
-		board[4][5].addToken( new Token("scout", 2, false, 10) );
+		board[4][4].addToken( new Token("bomb", 11, true, 0) );
+		board[4][5].addToken( new Token("miner", 3, false) );
+		
+		board[5][4].addToken( new Token("spy", 1, true) );
+		board[5][5].addToken( new Token("marshal", 10, false) );
 		
 	}
 	
@@ -338,7 +351,10 @@ public class BoardData{
 		return board[x][y];
 	}
 	
-	
+	//Returns the current turn
+	public boolean getTurn(){
+		return turn;
+	}
 	
 	
 	/*

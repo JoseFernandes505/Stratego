@@ -7,6 +7,7 @@ import java.awt.Color;
 public class Token{
 	private String tokenName;
 	private String iconPath;
+	private String bgPath;
 	private int rank;
 	private boolean teamBool;
 	private boolean moving = false;
@@ -18,6 +19,7 @@ public class Token{
 		rank = num;
 		teamBool = team;			//True = blue, False = red
 		iconPath = rank + "_" + tokenName + "_" + (team ? "red" : "blue");
+		bgPath = "bg_" + (team ? "red" : "blue");
 	}
 	
 	//Constructor for bombs and scouts, changes the movement range
@@ -41,13 +43,17 @@ public class Token{
 		return movementRange;
 	}
 	
-	//Returns a boolean based on the team color (Red == true, Blue == false)
+	//Returns a boolean based on the team color (Blue == true, Red == false)
 	public boolean getTeam(){
 		return teamBool;
 	}
 	
 	public String getPathname(){
 		return iconPath;
+	}
+	
+	public String getBgPathname(){
+		return bgPath;
 	}
 	
 	public boolean isMoving(){
