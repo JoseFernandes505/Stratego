@@ -17,23 +17,28 @@ public class Game {
 		JFrame f = new JFrame("Prarie Dog");	
 		
 		//Creates a game within the current frame
-		createGameFrame(f);
+		//createGameFrame(f);
+		
+		BoardData board = new BoardData();
+		board.populateTestBoard();					//TODO Only for testing, should be removed
+		BoardFrame bf = new BoardFrame(board);
+		
 		
 		//Sets frame properties
-		f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-		f.setResizable(false);
-	    f.setSize( 1000, 1000); 
-	    f.setVisible( true );
-	    f.setLocationRelativeTo(null);
-		
+		bf.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		bf.setResizable( false );
+	    bf.setSize( 1000, 1000); 
+	    bf.setVisible( true );
+	    bf.setLocationRelativeTo(null);
 
 	}
 	
 	public static void createGameFrame( JFrame f){
+		/*
 		//Creates a board and a board panel with the board
 		BoardData b = new BoardData();
 		b.populateTestBoard();					//TODO Only for testing, should be removed
-		BoardPanel bp = new BoardPanel(b);
+		BoardFrame bp = new BoardFrame(b);
 		
 		//Creates a menu for a "New" option and adds it
 		JMenu newMenu = new JMenu("New");
@@ -58,6 +63,9 @@ public class Game {
 		//Sets a new layout and adds the boardpanel in the frame
 		f.setLayout(new BorderLayout());
 		f.add(bp, BorderLayout.CENTER);
+		*/
+		
+		
 	}
 
 }

@@ -5,7 +5,6 @@ import java.lang.String;
 import java.awt.Color;
 
 public class Token{
-	private String tokenName;
 	private String iconPath;
 	private String bgPath;
 	private int rank;
@@ -14,23 +13,17 @@ public class Token{
 	private int movementRange = 1;
 	
 	//Default constructor, sets name and rank
-	public Token(String name, int num, boolean team){
-		tokenName = name;
+	public Token(int num, boolean team){
 		rank = num;
 		teamBool = team;			//True = blue, False = red
-		iconPath = rank + "_" + tokenName + "_" + (team ? "red" : "blue");
+		iconPath = rank + "_" + getRankName().toLowerCase() + "_" + (team ? "red" : "blue");
 		bgPath = "bg_" + (team ? "red" : "blue");
 	}
 	
 	//Constructor for bombs and scouts, changes the movement range
-	public Token(String name, int num, boolean team, int range){
-		this(name, num, team);
+	public Token(int num, boolean team, int range){
+		this(num, team);
 		movementRange = range;
-	}
-	
-	//Returns the tile's name
-	public String getName(){
-		return tokenName;
 	}
 	
 	//Returns the rank of the token
@@ -81,5 +74,38 @@ public class Token{
 		
 		return rank - t.getRank();
 
+	}
+	
+	//Returns the title of the piece based on its rank
+	public String getRankName(){
+		//Checks the rank and returns the correct name
+		switch(rank){
+			case 0:
+				return "Flag";
+			case 1:
+				return "Spy";
+			case 2:
+				return "Scout";
+			case 3:
+				return "Miner";
+			case 4:
+				return "Sergeant";
+			case 5:
+				return "Lieutenant";
+			case 6:
+				return "Captain";
+			case 7:
+				return "Major";
+			case 8:
+				return "Colonel";
+			case 9:
+				return "General";
+			case 10:
+				return "Marshal";
+			case 11:
+				return "Bomb";
+		}
+		
+		return "";
 	}
 }

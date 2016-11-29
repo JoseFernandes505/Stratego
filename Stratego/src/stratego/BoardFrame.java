@@ -1,14 +1,18 @@
 //Created by Jose Fernandes
 
 package stratego;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 /*
  * 
@@ -16,14 +20,26 @@ import javax.swing.JPanel;
  * buttons which allow for player interaction with the board are placed
  * 
  */
-public class BoardPanel extends JPanel implements ActionListener{
+public class BoardFrame extends JFrame implements ActionListener{
 	
 	//An array of buttons which correspond to the tiles within the BoardData object
 	private JButton[][] tileButtons;
+	//An array of buttons for the representations of the living tokens
+	private JButton[] currentTokens;
+	//An array of buttons for the representations of the off board tokens
+	private JButton[] offBoardTokens;
 	//Gridlayout within which all the buttons are placed
 	private GridLayout gridLayout; 
 	//board object, contains all the board data
 	private BoardData board;
+	//Panel for the board to be displayed on
+	private JPanel boardPanel;
+	//Tabbed panel for the dashboard
+	private JTabbedPane dashboard;
+	//Shows the player's current pieces
+	private JPanel currentPieces;
+	//Shows the player's pieces at the beginning of the game
+	private JPanel offBoardPieces;
 
 	
 	
@@ -33,13 +49,15 @@ public class BoardPanel extends JPanel implements ActionListener{
 	 * 
 	 */
 	
-	public BoardPanel(BoardData b){
+	public BoardFrame(BoardData b){
 		//sets the board as a passed in board
 		board = b;
+		//Sets the panel in the frame up
+		boardPanel = new JPanel();
 		//Creates a new gridlayout for the 10x10 grid
 		gridLayout = new GridLayout(board.getWidth(),board.getHeight());
 		//Sets the layout
-		setLayout( gridLayout );
+		boardPanel.setLayout( gridLayout );
 		
 		//Initializes the buttons to be the same size as the board
 		tileButtons = new JButton[board.getWidth()][board.getHeight()];
@@ -60,13 +78,37 @@ public class BoardPanel extends JPanel implements ActionListener{
 				tileButtons[i][j].addActionListener( this );
 				
 				//Adds the button to the panel
-				add(tileButtons[i][j]);
+				boardPanel.add(tileButtons[i][j]);
 			}
 		
 		}
 		
+		add( boardPanel, BorderLayout.CENTER );
 		//Sets the icons for all the tiles
 		setAllIcons();
+		
+		dashboard = new JTabbedPane();
+		currentPieces = new JPanel();
+		offBoardPieces = new JPanel();
+		
+		offBoardPieces.setLayout( new GridLayout(6, 2) );
+		offBoardTokens = new JButton[ 12 ];
+		
+		
+		for(int i = 0; i < offBoardTokens.length; i++){
+			offBoardTokens[i] = new JButton("" + i);
+			offBoardPieces.add( offBoardTokens[i] );
+		}
+		
+		dashboard.add( offBoardPieces, "Not On Board" );
+		dashboard.add( currentPieces, "On Board" );
+		
+		
+		
+		add( dashboard, BorderLayout.EAST );
+		
+		System.out.println( getNumPieces(5, true) );
+		System.out.println( getNumPieces(5, false) );
 		
 	}
 
@@ -79,6 +121,8 @@ public class BoardPanel extends JPanel implements ActionListener{
 	 */
 	@Override
 	public void actionPerformed(ActionEvent ae) {
+		
+		
 		//Sets X and Y to be the source's X and Y
 		int x = findButtonsX( (JButton) ae.getSource() );
 		int y = findButtonsY( (JButton) ae.getSource(), x );
@@ -168,6 +212,7 @@ public class BoardPanel extends JPanel implements ActionListener{
 				int x = findButtonsX(tileButtons[i][j]);
 				int y = findButtonsY(tileButtons[i][j], x);
 				
+				//Icon for the token icon
 				ImageIcon icon = null;
 				
 				//If the corresponding tile has a token
@@ -235,4 +280,30 @@ public class BoardPanel extends JPanel implements ActionListener{
 		return -1;
 	}
 	
+	//Gets the number of any specific piece there is on the board
+	public int getNumPieces(int rank, boolean team){		
+		//Temp value to hold the number of the pieces
+		int temp = 0;
+		//Loops through the board
+		for(int i = 0; i < board.getWidth(); i++){
+			for(int j = 0; j < board.getHeight(); j++){
+				
+				//If the tile is not empty, checks if the token is the target token, then increments if it is
+				if( board.getTile(i, j).getToken() != null ){
+					
+					if( board.getTile(i, j).getToken().getRank() == rank &&
+						board.getTile(i, j).getToken().getTeam() == team){
+
+							temp++;
+						
+					}			
+					
+				}
+				
+			}
+		}
+		
+		//Returns how many there are
+		return temp;
+	}
 }

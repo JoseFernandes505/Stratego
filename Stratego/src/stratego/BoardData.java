@@ -2,8 +2,7 @@
 
 package stratego;
 
-import java.awt.Color;
-import java.util.List;
+import java.util.ArrayList;
 
 public class BoardData{
 	
@@ -18,7 +17,12 @@ public class BoardData{
 	
 	
 	//A list of all the inital token values
-	public List<Token> initialTokens;
+	public ArrayList<Token> offBoardTokensRed;
+	public ArrayList<Token> offBoardTokensBlue;
+	
+	public ArrayList<Token> currTokensRed;
+	public ArrayList<Token> currTokensBlue;
+	
 	
 	//Width and height of board
 	private int width = 10;
@@ -50,6 +54,16 @@ public class BoardData{
 	public BoardData(){
 		board = new Tile[width][height];
 		buildBoard();
+		
+		//TODO Instantiate the lists then keep workin on that shit lol
+		
+		offBoardTokensRed = new ArrayList<Token>();
+		offBoardTokensBlue = new ArrayList<Token>();
+		
+		currTokensRed = new ArrayList<Token>();
+		currTokensBlue = new ArrayList<Token>();
+		
+		initializeList();
 	}
 	
 	
@@ -231,54 +245,66 @@ public class BoardData{
 	
 	
 	//Initializes the list of initial tokens, to be placed on the board
-	public void initializeList(boolean color){
+	public void initializeList(){
 		
 		for(int i = 0; i < flagNum; i++ ){
-			initialTokens.add( new Token("flag", 0, color, 0) );
+			offBoardTokensRed.add( new Token(0, false, 0) );
+			offBoardTokensBlue.add( new Token(0, true, 0) );
 		}
 		
 		for(int i = 0; i < bombNum; i++ ){
-			initialTokens.add( new Token("bomb", 11, color, 0) );
+			offBoardTokensRed.add( new Token(11, false, 0) );
+			offBoardTokensBlue.add( new Token(11, true, 0) );
 		}
 		
 		for(int i = 0; i < marshalNum; i++ ){
-			initialTokens.add( new Token("marshal", 10, color) );
+			offBoardTokensRed.add( new Token(10, false) );
+			offBoardTokensBlue.add( new Token(10, true) );
 		}
 		
 		for(int i = 0; i < generalNum; i++ ){
-			initialTokens.add( new Token("general", 9, color) );
+			offBoardTokensRed.add( new Token(9, false) );
+			offBoardTokensBlue.add( new Token(9, true) );
 		}
 		
 		for(int i = 0; i < colonelNum; i++ ){
-			initialTokens.add( new Token("colonel", 8, color) );
+			offBoardTokensRed.add( new Token(8, false) );
+			offBoardTokensBlue.add( new Token(8, true) );
 		}
 		
 		for(int i = 0; i < majorNum; i++ ){
-			initialTokens.add( new Token("major", 7, color) );
+			offBoardTokensRed.add( new Token(7, false) );
+			offBoardTokensBlue.add( new Token(7, true) );
 		}
 		
 		for(int i = 0; i < captainNum; i++ ){
-			initialTokens.add( new Token("captain", 6, color) );
+			offBoardTokensRed.add( new Token(6, false) );
+			offBoardTokensBlue.add( new Token(6, true) );
 		}
 		
 		for(int i = 0; i < lieutenantNum; i++ ){
-			initialTokens.add( new Token("lieutenant", 5, color) );
+			offBoardTokensRed.add( new Token(5, false) );
+			offBoardTokensBlue.add( new Token(5, true) );
 		}
 		
 		for(int i = 0; i < sergeantNum; i++ ){
-			initialTokens.add( new Token("sergeant", 4, color) );
+			offBoardTokensRed.add( new Token(4, false) );
+			offBoardTokensBlue.add( new Token(4, true) );
 		}
 		
 		for(int i = 0; i < minerNum; i++ ){
-			initialTokens.add( new Token("miner", 3, color) );
+			offBoardTokensRed.add( new Token(3, false) );
+			offBoardTokensBlue.add( new Token(3, true) );
 		}
 		
 		for(int i = 0; i < scoutNum; i++ ){
-			initialTokens.add( new Token("scout", 2, color, (width > height ? width : height)) );
+			offBoardTokensRed.add( new Token(2, true, (width > height ? width : height)) );
+			offBoardTokensBlue.add( new Token(2, false, (width > height ? width : height)) );
 		}
 		
 		for(int i = 0; i < spyNum; i++ ){
-			initialTokens.add( new Token("spy", 1, color) );
+			offBoardTokensRed.add( new Token(1, false) );
+			offBoardTokensBlue.add( new Token(1, true) );
 		}
 	}
 
@@ -296,21 +322,21 @@ public class BoardData{
 			for(int j = 0; j < height; j++){
 				
 				if(i < 4 ){
-					board[i][j].addToken( new Token("lieutenant", 5, false) );
+					board[i][j].addToken( new Token(5, false) );
 				}
 				
 				if(i > 5 ){
-					board[i][j].addToken( new Token("lieutenant", 5, true) );
+					board[i][j].addToken( new Token(5, true) );
 				}
 				
 			}
 		}
 		
-		board[4][4].addToken( new Token("bomb", 11, true, 0) );
-		board[4][5].addToken( new Token("miner", 3, false) );
+		board[4][4].addToken( new Token(11, true, 0) );
+		board[4][5].addToken( new Token(3, false) );
 		
-		board[5][4].addToken( new Token("spy", 1, true) );
-		board[5][5].addToken( new Token("marshal", 10, false) );
+		board[5][4].addToken( new Token(1, true) );
+		board[5][5].addToken( new Token(10, false) );
 		
 	}
 	
@@ -354,6 +380,20 @@ public class BoardData{
 	//Returns the current turn
 	public boolean getTurn(){
 		return turn;
+	}
+	
+	public ArrayList<Token> getCurrTokens(boolean team){
+		if(team){
+			return currTokensBlue;
+		}
+		return currTokensRed;
+	}
+	
+	public ArrayList<Token> getOffBoardTokens(boolean team){
+		if(team){
+			return offBoardTokensBlue;
+		}
+		return offBoardTokensRed;
 	}
 	
 	
