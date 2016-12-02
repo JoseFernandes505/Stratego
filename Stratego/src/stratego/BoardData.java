@@ -42,10 +42,15 @@ public class BoardData{
 	 *  bombNum = 6
 	 * 
 	 */
-	private int[] initialNums = {  1, 1, 8, 5,
-								   4, 4, 4, 3,
-								   2, 1, 1, 6  };
+	private int[] initialNums = //{  1, 1, 8, 5,
+								//   4, 4, 4, 3,
+								//   2, 1, 1, 6  };
 	
+		{  0, 0, 0, 0,
+		   0, 0, 0, 0,
+		   0, 0, 0, 1
+		};
+			
 	/*
 	 * 
 	 * 		CONSTRUCTOR & INITIALIZER FUNCTION
@@ -237,15 +242,19 @@ public class BoardData{
 	}
 	
 	//Adds a new token to the board at the specified location
-	public void setToken(int x, int y, Token tok){
+	public boolean setToken(int x, int y, Token tok){
 		if( tok.getTeam() ){
 			if( x < 4 ){
 				board[x][y].addToken( tok );
+				return true;
 			}
+			return false;
 		} else {
 			if( x > 5 ){
 				board[x][y].addToken( tok );
+				return true;
 			}
+			return false;
 		}
 		
 		

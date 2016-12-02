@@ -20,7 +20,7 @@ import javax.swing.JTabbedPane;
  * buttons which allow for player interaction with the board are placed
  * 
  */
-public class BoardFrame extends JFrame implements ActionListener{
+public class GamePanel extends JPanel implements ActionListener{
 	
 	//An array of buttons which correspond to the tiles within the BoardData object
 	private JButton[][] tileButtons;
@@ -42,9 +42,9 @@ public class BoardFrame extends JFrame implements ActionListener{
 	private JPanel offBoardPieces;
 	//Token used when setting up board
 	private Token chosenToken;
-	
+	//Checks if the board is being set up with the initial pieces
 	private boolean currentlySettingUp = true;
-	
+	//Stores the inital turn, to be used to know when setup is over
 	private boolean initialTurn;
 
 	
@@ -55,7 +55,7 @@ public class BoardFrame extends JFrame implements ActionListener{
 	 * 
 	 */
 	
-	public BoardFrame(BoardData b){
+	public GamePanel(BoardData b){
 		//sets the board as a passed in board
 		board = b;
 		//Sets the panel in the frame up
@@ -64,6 +64,8 @@ public class BoardFrame extends JFrame implements ActionListener{
 		gridLayout = new GridLayout(board.getWidth(),board.getHeight());
 		//Sets the layout
 		boardPanel.setLayout( gridLayout );
+		//Sets the layout of the parent 
+		setLayout(new BorderLayout());
 		//Sets the initial turn
 		initialTurn = board.getTurn();
 		
@@ -90,6 +92,8 @@ public class BoardFrame extends JFrame implements ActionListener{
 			}
 		
 		}
+		
+		boardPanel.setSize( (int) (getSize().getWidth() * 0.2), (int) getSize().getHeight() );
 		
 		add( boardPanel, BorderLayout.CENTER );
 		//Sets the icons for all the tiles
@@ -124,10 +128,16 @@ public class BoardFrame extends JFrame implements ActionListener{
 		//dashboard.add( currentPieces, "Board" );
 		dashboard.add( offBoardPieces, "Available Pieces" );
 
+		dashboard.setSize( (int) (getSize().getWidth() * 0.2), (int) getSize().getHeight() );
+		
 		//Adds the dashboard to the east side of the frame
 		add( dashboard, BorderLayout.EAST );
 		
+		
+		
 		updateDashboardButtons();
+		
+
 	}
 
 
@@ -140,7 +150,7 @@ public class BoardFrame extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		
-		
+		//Checks if the clicked button is on the game board
 		if( onBoardTiles((JButton)ae.getSource()) ){
 			//Sets X and Y to be the source's X and Y
 			int x = findButtonsX( (JButton) ae.getSource() );
@@ -169,8 +179,10 @@ public class BoardFrame extends JFrame implements ActionListener{
 				//If board has no token and is not in range, clears the highlights
 				if ( (board.getTile(x, y).getToken() == null || board.getTile(x, y).getToken().getTeam() != board.getTurn()) && chosenToken != null ){
 					if(board.getTile(x, y).isPassable()){
-						setupInitialTokens(x, y, chosenToken);
-						chosenToken = null;
+						//Checks that a tile was actually set before making the chosen token null
+						if( setupInitialTokens(x, y, chosenToken) ){
+							chosenToken = null;
+						}
 					}						
 				}
 			}
@@ -242,9 +254,22 @@ public class BoardFrame extends JFrame implements ActionListener{
 		if(currentlySettingUp){
 			if(board.getTurn() == initialTurn){
 				
+				for(int i = 0; i < currentTokens.length; i++){
+					currentTokens[i].setBorderPainted(false);
+					offBoardTokens[i].setBorderPainted(false);
+					
+					currentTokens[i].setBackground(Color.WHITE);
+					offBoardTokens[i].setBackground(Color.WHITE);
+					
+					currentPieces.add( currentTokens[i] );
+					offBoardPieces.add( offBoardTokens[i] );
+				}
+				
+				//Sets up the new board tabs
 				dashboard.add(currentPieces, "Battlefield");
 				dashboard.add(offBoardPieces, "Graveyard");				
 				
+				//Starts the actual game
 				currentlySettingUp = false;
 			}
 		}
@@ -334,23 +359,30 @@ public class BoardFrame extends JFrame implements ActionListener{
 			
 	}
 	
-	public void setupInitialTokens(int x, int y, Token tok){
+	public boolean setupInitialTokens(int x, int y, Token tok){
 		
 		if( board.getInitialRankTokens( tok.getRank() ) - getNumTokens( tok.getRank(), board.getTurn() ) > 0){
 			//Sets the token
-			board.setToken(x, y, tok);
+			boolean success = board.setToken(x, y, tok);
 			
 			setAllIcons();
 			updateDashboardButtons();
 			
+			boolean empty = true;
 			for(int i = 0; i < offBoardTokens.length; i++){
 				if( board.getInitialRankTokens(i) - getNumTokens(i, board.getTurn() ) != 0){
-					return;
+					empty = false;
 				}
 			}
 			
-			switchTurn();
+			if(empty){
+				switchTurn();
+			}
+			
+			return success;
 		}
+		
+		return false;
 	}
 	
 	//Function to find the position of a button in the buttonarray in terms of X and Y

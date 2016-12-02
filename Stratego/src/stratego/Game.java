@@ -21,15 +21,20 @@ public class Game {
 		
 		BoardData board = new BoardData();
 		//board.populateTestBoard();					//TODO Only for testing, should be removed
-		BoardFrame bf = new BoardFrame(board);
+		GamePanel bf = new GamePanel(board);
 		
+		//FIXME
+		bf.setSize(1000, 1000);
+		
+		f.setSize( 1000, 1000); 
+		f.add( bf, BorderLayout.CENTER );
 		
 		//Sets frame properties
-		bf.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-		bf.setResizable( false );
-	    bf.setSize( 1000, 1000); 
-	    bf.setVisible( true );
-	    bf.setLocationRelativeTo(null);
+		f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		f.setResizable( false );
+	    
+	    f.setVisible( true );
+	    f.setLocationRelativeTo(null);
 
 	}
 	
