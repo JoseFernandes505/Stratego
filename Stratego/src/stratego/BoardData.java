@@ -15,35 +15,36 @@ public class BoardData{
 	//Board array
 	private Tile[][] board;
 	
-	
-	//A list of all the inital token values
-	public ArrayList<Token> offBoardTokensRed;
-	public ArrayList<Token> offBoardTokensBlue;
-	
-	public ArrayList<Token> currTokensRed;
-	public ArrayList<Token> currTokensBlue;
-	
-	
 	//Width and height of board
 	private int width = 10;
 	private int height = 10;
 	
 	//boolean to decribe turn
-	private boolean turn = true;
+	private boolean turn = false;
 	
-	//Number of each token	
-	private int bombNum = 6;
-	private int flagNum = 1;
-	private int marshalNum = 1;
-	private int generalNum = 1;
-	private int colonelNum = 2;
-	private int majorNum = 3;
-	private int captainNum = 4;
-	private int lieutenantNum = 4;
-	private int sergeantNum = 4;
-	private int minerNum = 5;
-	private int scoutNum = 8;
-	private int spyNum = 1;
+
+	/*
+	 * 	Array that holds the number of initial pieces of each rank.
+	 * 	They are organized by the rank so that it equals the index.
+	 *  Translates to 
+	 * 	
+	 *  flagNum = 1
+	 *  marshalNum = 1
+	 *  generalNum = 1
+	 *  colonelNum = 2
+	 *  majorNum = 3
+	 *  captainNum = 4
+	 *  lieutenantNum = 4
+	 *  sergeantNum = 4
+	 *  minerNum = 5
+	 *  scoutNum = 8
+	 *  spyNum = 1
+	 *  bombNum = 6
+	 * 
+	 */
+	private int[] initialNums = {  1, 1, 8, 5,
+								   4, 4, 4, 3,
+								   2, 1, 1, 6  };
 	
 	/*
 	 * 
@@ -56,14 +57,6 @@ public class BoardData{
 		buildBoard();
 		
 		//TODO Instantiate the lists then keep workin on that shit lol
-		
-		offBoardTokensRed = new ArrayList<Token>();
-		offBoardTokensBlue = new ArrayList<Token>();
-		
-		currTokensRed = new ArrayList<Token>();
-		currTokensBlue = new ArrayList<Token>();
-		
-		initializeList();
 	}
 	
 	
@@ -220,7 +213,7 @@ public class BoardData{
 		}
 		
 		
-		
+		//Does the actual battle
 		int result = getTile(attX, attY).getToken().doBattle( getTile(defX, defY).getToken() );
 		
 		if( result > 0 ) {
@@ -243,69 +236,19 @@ public class BoardData{
 		turn = !turn;		
 	}
 	
-	
-	//Initializes the list of initial tokens, to be placed on the board
-	public void initializeList(){
-		
-		for(int i = 0; i < flagNum; i++ ){
-			offBoardTokensRed.add( new Token(0, false, 0) );
-			offBoardTokensBlue.add( new Token(0, true, 0) );
+	//Adds a new token to the board at the specified location
+	public void setToken(int x, int y, Token tok){
+		if( tok.getTeam() ){
+			if( x < 4 ){
+				board[x][y].addToken( tok );
+			}
+		} else {
+			if( x > 5 ){
+				board[x][y].addToken( tok );
+			}
 		}
 		
-		for(int i = 0; i < bombNum; i++ ){
-			offBoardTokensRed.add( new Token(11, false, 0) );
-			offBoardTokensBlue.add( new Token(11, true, 0) );
-		}
 		
-		for(int i = 0; i < marshalNum; i++ ){
-			offBoardTokensRed.add( new Token(10, false) );
-			offBoardTokensBlue.add( new Token(10, true) );
-		}
-		
-		for(int i = 0; i < generalNum; i++ ){
-			offBoardTokensRed.add( new Token(9, false) );
-			offBoardTokensBlue.add( new Token(9, true) );
-		}
-		
-		for(int i = 0; i < colonelNum; i++ ){
-			offBoardTokensRed.add( new Token(8, false) );
-			offBoardTokensBlue.add( new Token(8, true) );
-		}
-		
-		for(int i = 0; i < majorNum; i++ ){
-			offBoardTokensRed.add( new Token(7, false) );
-			offBoardTokensBlue.add( new Token(7, true) );
-		}
-		
-		for(int i = 0; i < captainNum; i++ ){
-			offBoardTokensRed.add( new Token(6, false) );
-			offBoardTokensBlue.add( new Token(6, true) );
-		}
-		
-		for(int i = 0; i < lieutenantNum; i++ ){
-			offBoardTokensRed.add( new Token(5, false) );
-			offBoardTokensBlue.add( new Token(5, true) );
-		}
-		
-		for(int i = 0; i < sergeantNum; i++ ){
-			offBoardTokensRed.add( new Token(4, false) );
-			offBoardTokensBlue.add( new Token(4, true) );
-		}
-		
-		for(int i = 0; i < minerNum; i++ ){
-			offBoardTokensRed.add( new Token(3, false) );
-			offBoardTokensBlue.add( new Token(3, true) );
-		}
-		
-		for(int i = 0; i < scoutNum; i++ ){
-			offBoardTokensRed.add( new Token(2, true, (width > height ? width : height)) );
-			offBoardTokensBlue.add( new Token(2, false, (width > height ? width : height)) );
-		}
-		
-		for(int i = 0; i < spyNum; i++ ){
-			offBoardTokensRed.add( new Token(1, false) );
-			offBoardTokensBlue.add( new Token(1, true) );
-		}
 	}
 
 	
@@ -382,83 +325,9 @@ public class BoardData{
 		return turn;
 	}
 	
-	public ArrayList<Token> getCurrTokens(boolean team){
-		if(team){
-			return currTokensBlue;
-		}
-		return currTokensRed;
+	public int getInitialRankTokens(int rank){
+		return initialNums[rank];
 	}
-	
-	public ArrayList<Token> getOffBoardTokens(boolean team){
-		if(team){
-			return offBoardTokensBlue;
-		}
-		return offBoardTokensRed;
-	}
-	
-	
-	/*
-	//Sets a token of an inputted rank and team at an X and Y position
-	public boolean setToken(int rank, boolean color, int xpos, int ypos){
-		
-		//Makes sure that the x and y inputs are both within range
-		if(xpos >= width || xpos < 0){
-			return false;
-		}
-		if(ypos >= height || ypos < 0){
-			return false;
-		}
-		
-		//Makes sure that the tile does not already have a token
-		if(board[xpos][ypos] != null){
-			return false;
-		} 
-		
-		//Switch statement to set the position as a token of the inputted rank/color
-		switch(rank){
-			case 0:
-				board[xpos][ypos].addToken( new Token("flag", rank, color) );
-				return true;
-			case 1:
-				board[xpos][ypos].addToken( new Token("spy", rank, color) );
-				return true;
-			case 2:
-				board[xpos][ypos].addToken( new Token("scout", rank, color) );
-				return true;
-			case 3:
-				board[xpos][ypos].addToken( new Token("miner", rank, color) );
-				return true;
-			case 4:
-				board[xpos][ypos].addToken( new Token("sergeant", rank, color) );
-				return true;
-			case 5:
-				board[xpos][ypos].addToken( new Token("lieutenant", rank, color) );
-				return true;
-			case 6:
-				board[xpos][ypos].addToken( new Token("captain", rank, color) );
-				return true;
-			case 7:
-				board[xpos][ypos].addToken( new Token("major", rank, color) );
-				return true;
-			case 8:
-				board[xpos][ypos].addToken( new Token("colonel", rank, color) );
-				return true;
-			case 9:
-				board[xpos][ypos].addToken( new Token("general", rank, color) );
-				return true;
-			case 10:
-				board[xpos][ypos].addToken( new Token("marshal", rank, color) );
-				return true;
-			case 11:
-				board[xpos][ypos].addToken( new Token("bomb", rank, color) );
-				return true;
-			default:
-				return false;			
-		}
-		
-	}
-	
-	*/
 	
 	
 	

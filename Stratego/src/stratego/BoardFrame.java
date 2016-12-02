@@ -40,6 +40,12 @@ public class BoardFrame extends JFrame implements ActionListener{
 	private JPanel currentPieces;
 	//Shows the player's pieces at the beginning of the game
 	private JPanel offBoardPieces;
+	//Token used when setting up board
+	private Token chosenToken;
+	
+	private boolean currentlySettingUp = true;
+	
+	private boolean initialTurn;
 
 	
 	
@@ -58,6 +64,8 @@ public class BoardFrame extends JFrame implements ActionListener{
 		gridLayout = new GridLayout(board.getWidth(),board.getHeight());
 		//Sets the layout
 		boardPanel.setLayout( gridLayout );
+		//Sets the initial turn
+		initialTurn = board.getTurn();
 		
 		//Initializes the buttons to be the same size as the board
 		tileButtons = new JButton[board.getWidth()][board.getHeight()];
@@ -87,29 +95,39 @@ public class BoardFrame extends JFrame implements ActionListener{
 		//Sets the icons for all the tiles
 		setAllIcons();
 		
+		//Makes a Dashboard to hold different piece category views
 		dashboard = new JTabbedPane();
 		currentPieces = new JPanel();
 		offBoardPieces = new JPanel();
 		
+		//Sets the layouts for the two different panels
 		offBoardPieces.setLayout( new GridLayout(6, 2) );
+		currentPieces.setLayout( new GridLayout(6, 2) );
+		
+		//Initializes the buttons for each panel
 		offBoardTokens = new JButton[ 12 ];
+		currentTokens = new JButton[ 12 ];
 		
-		
+		//Initializes the buttons and adds them to the panels 
 		for(int i = 0; i < offBoardTokens.length; i++){
 			offBoardTokens[i] = new JButton("" + i);
+			currentTokens[i] = new JButton("" + i);
+			
+			offBoardTokens[i].addActionListener(this);
+			currentTokens[i].addActionListener(this);
+			
 			offBoardPieces.add( offBoardTokens[i] );
+			currentPieces.add( currentTokens[i] );
 		}
 		
-		dashboard.add( offBoardPieces, "Not On Board" );
-		dashboard.add( currentPieces, "On Board" );
-		
-		
-		
+		//Adds the panels to the dashboard
+		//dashboard.add( currentPieces, "Board" );
+		dashboard.add( offBoardPieces, "Available Pieces" );
+
+		//Adds the dashboard to the east side of the frame
 		add( dashboard, BorderLayout.EAST );
 		
-		System.out.println( getNumPieces(5, true) );
-		System.out.println( getNumPieces(5, false) );
-		
+		updateDashboardButtons();
 	}
 
 
@@ -123,25 +141,51 @@ public class BoardFrame extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent ae) {
 		
 		
-		//Sets X and Y to be the source's X and Y
-		int x = findButtonsX( (JButton) ae.getSource() );
-		int y = findButtonsY( (JButton) ae.getSource(), x );
+		if( onBoardTiles((JButton)ae.getSource()) ){
+			//Sets X and Y to be the source's X and Y
+			int x = findButtonsX( (JButton) ae.getSource() );
+			int y = findButtonsY( (JButton) ae.getSource(), x );
+			
+			//Checks if Board isn't being set up
+			if( !currentlySettingUp ){
+				//If the board has a token, and that token is currently moving. Resets the background and makes it not moving
+				if( board.getTile(x, y).getToken() != null && board.getTile(x, y).getToken().isMoving() ){
+					clearBoardBackground();
+					board.clearBoardData();
+				//If the board has a token, the tile is not moving(so as to make sure it isn't selected), and the tile is in range. This does battle
+				} else if( 	board.getTile(x, y).getToken() != null && !board.getTile(x, y).getToken().isMoving() &&	board.getTile(x, y).inRange()){
+					doBattle(x, y);
+					switchTurn();
+				//If the board has a token, and the tile is of the current turn
+				} else if(	board.getTile(x, y).getToken() != null && board.getTile(x, y).getToken().getTeam() == board.getTurn()){
+					HighlightTiles( board.getTile(x, y).getToken(), x, y );
+				//If the board is in range it moves the token to it
+				} else if(	board.getTile(x, y).inRange()){
+					MoveToken(x, y);
+					switchTurn();
+				}
+			//Checks that board is being set up
+			} else if( currentlySettingUp ){
+				//If board has no token and is not in range, clears the highlights
+				if ( (board.getTile(x, y).getToken() == null || board.getTile(x, y).getToken().getTeam() != board.getTurn()) && chosenToken != null ){
+					if(board.getTile(x, y).isPassable()){
+						setupInitialTokens(x, y, chosenToken);
+						chosenToken = null;
+					}						
+				}
+			}
+			
+			
+			
+		} 
 		
-		
-		if( board.getTile(x, y).getToken() != null && board.getTile(x, y).getToken().isMoving() ){
-			clearBoardBackground();
-			board.clearBoardData();
-		} else if( 	board.getTile(x, y).getToken() != null && !board.getTile(x, y).getToken().isMoving() &&	board.getTile(x, y).inRange()){
-			doBattle(x, y);
-			switchTurn();
-		} else if(	board.getTile(x, y).getToken() != null && board.getTile(x, y).getToken().getTeam() == board.getTurn()){
-			HighlightTiles( board.getTile(x, y).getToken(), x, y );
-		} else if(	board.getTile(x, y).inRange()){
-			MoveToken(x, y);
-			switchTurn();
-		} else if( !board.getTile(x, y).inRange() && board.getTile(x, y).getToken() == null ){
-			clearBoardBackground();
-			board.clearBoardData();
+		//Gets the token from the dashboard and sets the chosen token 
+		if( onOffBoardDashboard( (JButton)ae.getSource() ) ){
+			
+			int rank = findRank( (JButton)ae.getSource(), offBoardTokens );
+			
+			chosenToken = new Token(rank, board.getTurn());
+			
 		}
 	}
 	
@@ -180,6 +224,7 @@ public class BoardFrame extends JFrame implements ActionListener{
 		setAllIcons();
 	}
 	
+	//Compares the two pieces 
 	public void doBattle(int defX, int defY){
 		board.doBattle(defX, defY);
 		
@@ -192,6 +237,17 @@ public class BoardFrame extends JFrame implements ActionListener{
 		board.clearBoardData();
 		clearBoardBackground();
 		setAllIcons();
+		updateDashboardButtons();
+		
+		if(currentlySettingUp){
+			if(board.getTurn() == initialTurn){
+				
+				dashboard.add(currentPieces, "Battlefield");
+				dashboard.add(offBoardPieces, "Graveyard");				
+				
+				currentlySettingUp = false;
+			}
+		}
 	}
 		
 	
@@ -232,6 +288,32 @@ public class BoardFrame extends JFrame implements ActionListener{
 			}
 		}
 		
+		
+		
+	}
+	
+	public void updateDashboardButtons(){
+		
+		//Updates Current Tokens
+		for(int i = 0; i < currentTokens.length; i++){
+			currentTokens[i].setText( "x" + getNumTokens(i, board.getTurn()) );
+			
+			Token temp = new Token(i, board.getTurn());
+			
+			currentTokens[i].setIcon( new ImageIcon( this.getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) ) );
+		
+		}
+		
+		//Updates Offboard Tokens
+		for(int i = 0; i < offBoardTokens.length; i++){
+			offBoardTokens[i].setText( "x" + (board.getInitialRankTokens(i) - getNumTokens(i, board.getTurn())) );
+			
+			Token temp = new Token(i, board.getTurn());
+			
+			offBoardTokens[i].setIcon( new ImageIcon( this.getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) ) );
+		
+		}
+		
 	}
 	
 	//Clears the panel backgrounds, and makes everything not in range
@@ -250,6 +332,25 @@ public class BoardFrame extends JFrame implements ActionListener{
 			}
 		}
 			
+	}
+	
+	public void setupInitialTokens(int x, int y, Token tok){
+		
+		if( board.getInitialRankTokens( tok.getRank() ) - getNumTokens( tok.getRank(), board.getTurn() ) > 0){
+			//Sets the token
+			board.setToken(x, y, tok);
+			
+			setAllIcons();
+			updateDashboardButtons();
+			
+			for(int i = 0; i < offBoardTokens.length; i++){
+				if( board.getInitialRankTokens(i) - getNumTokens(i, board.getTurn() ) != 0){
+					return;
+				}
+			}
+			
+			switchTurn();
+		}
 	}
 	
 	//Function to find the position of a button in the buttonarray in terms of X and Y
@@ -280,8 +381,48 @@ public class BoardFrame extends JFrame implements ActionListener{
 		return -1;
 	}
 	
+	//Finds the rank of an button's token
+	public int findRank( JButton b, JButton[] array ){
+		
+		for(int i = 0; i < array.length; i++){
+			
+			if( array[i] == b ){
+				return i;
+			}
+			
+		}
+		
+		return -1;
+		
+	}
+	
+	//Checks that the button is on the board
+	public boolean onBoardTiles( JButton b ){
+		
+		for(int i = 0; i < tileButtons.length; i++){	
+			for(int j = 0; j < tileButtons[i].length; j++){
+				if( tileButtons[i][j] == b ){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	//Checks that the button is on the offboard dashboard
+	public boolean onOffBoardDashboard( JButton b ){
+		
+		for(int i = 0; i < offBoardTokens.length; i++){	
+			if( offBoardTokens[i] == b ){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 	//Gets the number of any specific piece there is on the board
-	public int getNumPieces(int rank, boolean team){		
+	public int getNumTokens(int rank, boolean team){		
 		//Temp value to hold the number of the pieces
 		int temp = 0;
 		//Loops through the board
@@ -293,9 +434,8 @@ public class BoardFrame extends JFrame implements ActionListener{
 					
 					if( board.getTile(i, j).getToken().getRank() == rank &&
 						board.getTile(i, j).getToken().getTeam() == team){
-
+							//Increments the number of that piece
 							temp++;
-						
 					}			
 					
 				}

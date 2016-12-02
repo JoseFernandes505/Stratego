@@ -18,6 +18,14 @@ public class Token{
 		teamBool = team;			//True = blue, False = red
 		iconPath = rank + "_" + getRankName().toLowerCase() + "_" + (team ? "red" : "blue");
 		bgPath = "bg_" + (team ? "red" : "blue");
+		
+		if(rank == 11 || rank == 0){
+			movementRange = 0;
+		}
+		
+		if( rank == 2 ){
+			movementRange = 10;
+		}
 	}
 	
 	//Constructor for bombs and scouts, changes the movement range

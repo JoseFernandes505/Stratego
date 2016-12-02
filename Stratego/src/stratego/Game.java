@@ -20,7 +20,7 @@ public class Game {
 		//createGameFrame(f);
 		
 		BoardData board = new BoardData();
-		board.populateTestBoard();					//TODO Only for testing, should be removed
+		//board.populateTestBoard();					//TODO Only for testing, should be removed
 		BoardFrame bf = new BoardFrame(board);
 		
 		
