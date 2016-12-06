@@ -22,6 +22,9 @@ import javax.swing.JTabbedPane;
  */
 public class GamePanel extends JPanel implements ActionListener{
 	
+	private final Color highlightGrassColor = new Color(0,204,0);
+	private final Color grassColor = new Color(51,102,0);
+	private final Color waterColor = new Color(0,0,204);
 	//An array of buttons which correspond to the tiles within the BoardData object
 	private JButton[][] tileButtons;
 	//An array of buttons for the representations of the living tokens
@@ -79,9 +82,9 @@ public class GamePanel extends JPanel implements ActionListener{
 				//Sets the button's color to be based on the 
 				tileButtons[i][j] = new JButton();
 				if( board.getTile(i,j).isPassable() ){
-					tileButtons[i][j].setBackground( Color.GREEN );
+					tileButtons[i][j].setBackground( grassColor );
 				} else if ( !board.getTile(i,j).isPassable() ){
-					tileButtons[i][j].setBackground( Color.BLUE );
+					tileButtons[i][j].setBackground( waterColor );
 				}
 				
 				//Adds an action listener to the button
@@ -177,7 +180,7 @@ public class GamePanel extends JPanel implements ActionListener{
 			//Checks that board is being set up
 			} else if( currentlySettingUp ){
 				//If board has no token and is not in range, clears the highlights
-				if ( (board.getTile(x, y).getToken() == null || board.getTile(x, y).getToken().getTeam() != board.getTurn()) && chosenToken != null ){
+				if ( (board.getTile(x, y).getToken() == null || board.getTile(x, y).getToken().getTeam() == board.getTurn()) && chosenToken != null ){
 					if(board.getTile(x, y).isPassable()){
 						//Checks that a tile was actually set before making the chosen token null
 						if( setupInitialTokens(x, y, chosenToken) ){
@@ -220,7 +223,7 @@ public class GamePanel extends JPanel implements ActionListener{
 			for(int j = 0; j < tileButtons[i].length; j++){
 				
 				if( board.getTile(i,j).isPassable() && board.getTile(i, j).inRange() ){
-					tileButtons[i][j].setBackground( Color.CYAN );
+					tileButtons[i][j].setBackground( highlightGrassColor );
 				} 				
 			}
 		}
@@ -255,9 +258,6 @@ public class GamePanel extends JPanel implements ActionListener{
 			if(board.getTurn() == initialTurn){
 				
 				for(int i = 0; i < currentTokens.length; i++){
-					currentTokens[i].setBorderPainted(false);
-					offBoardTokens[i].setBorderPainted(false);
-					
 					currentTokens[i].setBackground(Color.WHITE);
 					offBoardTokens[i].setBackground(Color.WHITE);
 					
@@ -300,10 +300,11 @@ public class GamePanel extends JPanel implements ActionListener{
 				if( board.getTile(x, y).getToken() != null ){
 					if( board.getTile(x, y).getToken().getTeam() == board.getTurn() ){
 						//Creates an imageicon of the tile's pathname
-						icon = new ImageIcon( this.getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getPathname() + ".png" ) );
+						System.out.println(getClass().getResource("/icons/" + board.getTile(x, y).getToken().getPathname() + ".png"));
+						icon = new ImageIcon( getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getPathname() + ".png" ) );
 					} else if( board.getTile(x, y).getToken().getTeam() != board.getTurn() ){
 						//Creates an imageicon of the tile's team bg
-						icon = new ImageIcon( this.getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getBgPathname() + ".png" ) );
+						icon = new ImageIcon( getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getBgPathname() + ".png" ) );
 					}
 					
 				}
@@ -325,8 +326,10 @@ public class GamePanel extends JPanel implements ActionListener{
 			
 			Token temp = new Token(i, board.getTurn());
 			
-			currentTokens[i].setIcon( new ImageIcon( this.getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) ) );
-		
+			System.out.println("Update Dashboard" + getClass().getResource( "/icons/" + temp.getPathname() + ".png" ));
+			if( getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) != null ){
+				currentTokens[i].setIcon( new ImageIcon( getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) ) );
+			}
 		}
 		
 		//Updates Offboard Tokens
@@ -335,8 +338,9 @@ public class GamePanel extends JPanel implements ActionListener{
 			
 			Token temp = new Token(i, board.getTurn());
 			
-			offBoardTokens[i].setIcon( new ImageIcon( this.getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) ) );
-		
+			if( getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) != null ){
+				offBoardTokens[i].setIcon( new ImageIcon( getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) ) );
+			}
 		}
 		
 	}
@@ -349,9 +353,9 @@ public class GamePanel extends JPanel implements ActionListener{
 				
 				//Sets all buttons to their default values
 				if( board.getTile(i, j).isPassable() ){
-					tileButtons[i][j].setBackground( Color.GREEN );
+					tileButtons[i][j].setBackground( grassColor );
 				} else if( !board.getTile(i, j).isPassable() ){
-					tileButtons[i][j].setBackground( Color.BLUE );
+					tileButtons[i][j].setBackground( waterColor );
 				}
 				
 			}

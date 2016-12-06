@@ -89,29 +89,29 @@ public class Token{
 		//Checks the rank and returns the correct name
 		switch(rank){
 			case 0:
-				return "flag";
+				return "Flag";
 			case 1:
-				return "spy";
+				return "Spy";
 			case 2:
-				return "scout";
+				return "Scout";
 			case 3:
-				return "miner";
+				return "Miner";
 			case 4:
-				return "sergeant";
+				return "Sergeant";
 			case 5:
-				return "lieutenant";
+				return "Lieutenant";
 			case 6:
-				return "captain";
+				return "Captain";
 			case 7:
-				return "major";
+				return "Major";
 			case 8:
-				return "colonel";
+				return "Colonel";
 			case 9:
-				return "general";
+				return "General";
 			case 10:
-				return "marshal";
+				return "Marshal";
 			case 11:
-				return "bomb";
+				return "Bomb";
 		}
 		
 		return "";
