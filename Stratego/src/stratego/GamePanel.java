@@ -3,14 +3,14 @@
 package stratego;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -43,10 +43,12 @@ public class GamePanel extends JPanel implements ActionListener{
 	private JPanel currentPieces;
 	//Shows the player's pieces at the beginning of the game
 	private JPanel offBoardPieces;
+	
+	private JLayeredPane layerPane;
 	//Token used when setting up board
 	private Token chosenToken;
 	//Checks if the board is being set up with the initial pieces
-	private boolean currentlySettingUp = true;
+	
 	//Stores the inital turn, to be used to know when setup is over
 	private boolean initialTurn;
 
@@ -136,14 +138,9 @@ public class GamePanel extends JPanel implements ActionListener{
 		//Adds the dashboard to the east side of the frame
 		add( dashboard, BorderLayout.EAST );
 		
-		
-		
 		updateDashboardButtons();
 		
-
 	}
-
-
 
 	/*
 	 * 
@@ -160,7 +157,7 @@ public class GamePanel extends JPanel implements ActionListener{
 			int y = findButtonsY( (JButton) ae.getSource(), x );
 			
 			//Checks if Board isn't being set up
-			if( !currentlySettingUp ){
+			if( !board.settingUp() && !board.gameWon() ){
 				//If the board has a token, and that token is currently moving. Resets the background and makes it not moving
 				if( board.getTile(x, y).getToken() != null && board.getTile(x, y).getToken().isMoving() ){
 					clearBoardBackground();
@@ -178,7 +175,7 @@ public class GamePanel extends JPanel implements ActionListener{
 					switchTurn();
 				}
 			//Checks that board is being set up
-			} else if( currentlySettingUp ){
+			} else if( board.settingUp() ){
 				//If board has no token and is not in range, clears the highlights
 				if ( (board.getTile(x, y).getToken() == null || board.getTile(x, y).getToken().getTeam() == board.getTurn()) && chosenToken != null ){
 					if(board.getTile(x, y).isPassable()){
@@ -254,7 +251,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		setAllIcons();
 		updateDashboardButtons();
 		
-		if(currentlySettingUp){
+		if( board.settingUp() ){
 			if(board.getTurn() == initialTurn){
 				
 				for(int i = 0; i < currentTokens.length; i++){
@@ -270,7 +267,16 @@ public class GamePanel extends JPanel implements ActionListener{
 				dashboard.add(offBoardPieces, "Graveyard");				
 				
 				//Starts the actual game
-				currentlySettingUp = false;
+				board.switchSetup();
+			}
+		}
+		
+		if( board.gameWon() ){
+			if( board.blueWin() ){
+				showWinConfirmation(true);
+				
+			} else if( board.redWin() ){
+				showWinConfirmation(false);
 			}
 		}
 	}
@@ -300,11 +306,10 @@ public class GamePanel extends JPanel implements ActionListener{
 				if( board.getTile(x, y).getToken() != null ){
 					if( board.getTile(x, y).getToken().getTeam() == board.getTurn() ){
 						//Creates an imageicon of the tile's pathname
-						System.out.println(getClass().getResource("/icons/" + board.getTile(x, y).getToken().getPathname() + ".png"));
-						icon = new ImageIcon( getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getPathname() + ".png" ) );
+						icon = new ImageIcon( getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getPathname() + ".jpg" ) );
 					} else if( board.getTile(x, y).getToken().getTeam() != board.getTurn() ){
 						//Creates an imageicon of the tile's team bg
-						icon = new ImageIcon( getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getBgPathname() + ".png" ) );
+						icon = new ImageIcon( getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getBgPathname() + ".jpg" ) );
 					}
 					
 				}
@@ -326,9 +331,9 @@ public class GamePanel extends JPanel implements ActionListener{
 			
 			Token temp = new Token(i, board.getTurn());
 			
-			System.out.println("Update Dashboard" + getClass().getResource( "/icons/" + temp.getPathname() + ".png" ));
-			if( getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) != null ){
-				currentTokens[i].setIcon( new ImageIcon( getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) ) );
+			//System.out.println("Update Dashboard" + getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ));
+			if( getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ) != null ){
+				currentTokens[i].setIcon( new ImageIcon( getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ) ) );
 			}
 		}
 		
@@ -338,8 +343,8 @@ public class GamePanel extends JPanel implements ActionListener{
 			
 			Token temp = new Token(i, board.getTurn());
 			
-			if( getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) != null ){
-				offBoardTokens[i].setIcon( new ImageIcon( getClass().getResource( "/icons/" + temp.getPathname() + ".png" ) ) );
+			if( getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ) != null ){
+				offBoardTokens[i].setIcon( new ImageIcon( getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ) ) );
 			}
 		}
 		
@@ -482,4 +487,13 @@ public class GamePanel extends JPanel implements ActionListener{
 		//Returns how many there are
 		return temp;
 	}
+	
+	public void showWinConfirmation(boolean winner){
+		
+		String teamName = (winner ? "Blue" : "Red");
+		
+		JOptionPane.showMessageDialog(this, "Congratulations " + teamName + " team! You have won!", teamName + " team Wins!", JOptionPane.PLAIN_MESSAGE);
+		
+	}
+	
 }

@@ -2,8 +2,6 @@
 
 package stratego;
 
-import java.util.ArrayList;
-
 public class BoardData{
 	
 	/*
@@ -21,6 +19,9 @@ public class BoardData{
 	
 	//boolean to decribe turn
 	private boolean turn = false;
+	private boolean currentlySettingUp = true;
+	private boolean gameWon = false;
+	private boolean blueWon = false, redWon = false;
 	
 
 	/*
@@ -46,9 +47,9 @@ public class BoardData{
 								//   4, 4, 4, 3,
 								//   2, 1, 1, 6  };
 	
-		{  0, 0, 1, 1,
+		{  1, 0, 1, 0,
 		   0, 0, 0, 0,
-		   0, 0, 2, 0
+		   0, 0, 1, 0
 		};
 			
 	/*
@@ -60,8 +61,6 @@ public class BoardData{
 	public BoardData(){
 		board = new Tile[width][height];
 		buildBoard();
-		
-		//TODO Instantiate the lists then keep workin on that shit lol
 	}
 	
 	
@@ -238,7 +237,32 @@ public class BoardData{
 	
 	//Switches the turn
 	public void switchTurn(){
-		turn = !turn;		
+		
+		boolean blueWin = false, redWin = false;
+		
+		if( !settingUp() ){
+			
+			blueWin = checkWinConditions( true );
+			redWin = checkWinConditions( false );
+			
+		}
+		
+		if(blueWin){
+			System.out.println("Blue wins!");
+			gameWon = true;
+			blueWon = true;
+		}
+		
+		if(redWin){
+			System.out.println("Red wins!");
+			gameWon = true;
+			redWon = true;
+		}
+		
+		if(!redWin && !blueWin){
+			turn = !turn;
+		}
+				
 	}
 	
 	//Adds a new token to the board at the specified location
@@ -267,31 +291,6 @@ public class BoardData{
 	 * 
 	 */
 	
-	//Populates the board with a lot of test values
-	public void populateTestBoard(){
-		
-		for(int i = 0; i < width; i++){
-			for(int j = 0; j < height; j++){
-				
-				if(i < 4 ){
-					board[i][j].addToken( new Token(5, false) );
-				}
-				
-				if(i > 5 ){
-					board[i][j].addToken( new Token(5, true) );
-				}
-				
-			}
-		}
-		
-		board[4][4].addToken( new Token(11, true, 0) );
-		board[4][5].addToken( new Token(3, false) );
-		
-		board[5][4].addToken( new Token(1, true) );
-		board[5][5].addToken( new Token(10, false) );
-		
-	}
-	
 	//Clears the board's range and movement data
 	public void clearBoardData(){
 		for(int i = 0; i < width; i++){
@@ -306,6 +305,33 @@ public class BoardData{
 				}
 			}
 		}
+	}
+	
+	public boolean checkWinConditions(boolean team){
+		
+		boolean moveableLeft = false, flagLeft = false;
+		
+		for(int i = 0; i < getWidth(); i++){	
+			for(int j = 0; j < getHeight(); j++){
+				
+				if(getTile(i,j).getToken() != null && getTile(i, j).getToken().getTeam() == team ){					
+					if( getTile(i, j).getToken().getRange() > 0 ){
+						moveableLeft = true;						
+					}
+					
+					if( getTile(i, j).getToken().getRank() == 0 ){
+						flagLeft = true;						
+					}
+				}
+				
+			}
+		}
+		
+		if( !moveableLeft || !flagLeft ){
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/*
@@ -334,12 +360,29 @@ public class BoardData{
 		return turn;
 	}
 	
+	public boolean settingUp(){
+		return currentlySettingUp;
+	}
+	
+	public void switchSetup(){
+		currentlySettingUp = !currentlySettingUp;
+	}
+	
+	public boolean gameWon(){
+		return gameWon;
+	}
+	
+	public boolean blueWin(){
+		return blueWon;
+	}
+	
+	public boolean redWin(){
+		return redWon;
+	}
+	
 	public int getInitialRankTokens(int rank){
 		return initialNums[rank];
 	}
-	
-	
-	
 	
 
 }

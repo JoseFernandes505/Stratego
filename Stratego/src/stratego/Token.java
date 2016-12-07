@@ -2,7 +2,6 @@
 
 package stratego;
 import java.lang.String;
-import java.awt.Color;
 
 public class Token{
 	private String iconPath;

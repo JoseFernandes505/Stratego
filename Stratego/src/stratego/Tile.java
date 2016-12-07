@@ -1,7 +1,6 @@
 //Created by Jose Fernandes
 
 package stratego;
-import java.lang.String;
 
 public class Tile {
 	private boolean passable;
