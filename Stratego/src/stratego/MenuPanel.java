@@ -77,7 +77,7 @@ public class MenuPanel extends JPanel{
 		gbc.gridy = 4;
 		buttonsP.add(quitB, gbc);
 		
-		buttonsP.setBackground( Color.LIGHT_GRAY );
+		buttonsP.setBackground( Color.DARK_GRAY );
 		
 		setLayout(new GridBagLayout());
 		add(buttonsP);
