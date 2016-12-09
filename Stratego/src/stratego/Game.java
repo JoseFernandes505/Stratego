@@ -3,10 +3,13 @@
 package stratego;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JFrame;
 
 //Main Game Running class
-public class Game {
+public class Game implements ActionListener{
 
 	static JFrame f;
 	static BoardData board;
@@ -17,20 +20,28 @@ public class Game {
 		f = new JFrame("Prarie Dog");	
 		
 		board = new BoardData();
-		GamePanel bf = new GamePanel(board);
+		GamePanel bp = new GamePanel(board);
+		MenuPanel mp = new MenuPanel( new Game() );
 		
 		//FIXME		
 		f.setSize( 1200, 1000); 
-		f.add( bf, BorderLayout.CENTER );
+		f.add( mp, BorderLayout.CENTER );
 		
 		//Sets frame properties
 		f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-		f.setResizable( false );
+		f.setResizable( true );
 	    
 	    f.setVisible( true );
 	    f.setLocationRelativeTo(null);
 	    
 
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		System.out.println("Button clicked!");
+		
+	}
+	
 
 }
