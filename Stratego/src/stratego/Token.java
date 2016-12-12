@@ -1,9 +1,10 @@
 //Created by Jose Fernandes
 
 package stratego;
+import java.io.Serializable;
 import java.lang.String;
 
-public class Token{
+public class Token implements Serializable{
 	private String iconPath;
 	private String bgPath;
 	private int rank;

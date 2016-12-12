@@ -1,7 +1,6 @@
 package stratego;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,7 +8,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -77,8 +76,7 @@ public class MenuPanel extends JPanel{
 		gbc.gridy = 4;
 		buttonsP.add(quitB, gbc);
 		
-		buttonsP.setBackground( Color.DARK_GRAY );
-		
+		buttonsP.setBorder( BorderFactory.createRaisedBevelBorder() );
 		setLayout(new GridBagLayout());
 		add(buttonsP);
 		

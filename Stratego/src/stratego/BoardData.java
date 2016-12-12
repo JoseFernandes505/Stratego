@@ -2,7 +2,9 @@
 
 package stratego;
 
-public class BoardData{
+import java.io.Serializable;
+
+public class BoardData implements Serializable{
 	
 	/*
 	 * 
@@ -23,6 +25,8 @@ public class BoardData{
 	private boolean gameWon = false;
 	private boolean blueWon = false, redWon = false;
 	
+	//Game Settings
+	private boolean reversedPieces = false;
 
 	/*
 	 * 	Array that holds the number of initial pieces of each rank.
@@ -58,9 +62,12 @@ public class BoardData{
 	 * 
 	 */
 	
-	public BoardData(){
+	public BoardData( boolean reverse ){
+		
+		reversedPieces = reverse;
 		board = new Tile[width][height];
 		buildBoard();
+		
 	}
 	
 	
@@ -378,6 +385,10 @@ public class BoardData{
 	
 	public boolean redWin(){
 		return redWon;
+	}
+	
+	public boolean reversedPieces(){
+		return reversedPieces;
 	}
 	
 	public int getInitialRankTokens(int rank){

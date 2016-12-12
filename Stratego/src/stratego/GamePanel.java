@@ -305,11 +305,23 @@ public class GamePanel extends JPanel implements ActionListener{
 				//If the corresponding tile has a token
 				if( board.getTile(x, y).getToken() != null ){
 					if( board.getTile(x, y).getToken().getTeam() == board.getTurn() ){
-						//Creates an imageicon of the tile's pathname
-						icon = new ImageIcon( getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getPathname() + ".jpg" ) );
+						
+						//Gets the path for the imageicon
+						String path = "/icons/" + board.getTile(x, y).getToken().getPathname();
+						
+						//Edits the path to the reverse should that setting be in place
+						if(board.reversedPieces()){
+							path += "_r";
+						}
+						
+						path +=  ".jpg";
+						
+						icon = new ImageIcon( getClass().getResource( path ) );
 					} else if( board.getTile(x, y).getToken().getTeam() != board.getTurn() ){
+						
 						//Creates an imageicon of the tile's team bg
 						icon = new ImageIcon( getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getBgPathname() + ".jpg" ) );
+					
 					}
 					
 				}
@@ -331,10 +343,15 @@ public class GamePanel extends JPanel implements ActionListener{
 			
 			Token temp = new Token(i, board.getTurn());
 			
-			//System.out.println("Update Dashboard" + getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ));
-			if( getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ) != null ){
-				currentTokens[i].setIcon( new ImageIcon( getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ) ) );
+			String path = "/icons/" + temp.getPathname();
+			
+			if(board.reversedPieces()){
+				path += "_r";
 			}
+			
+			path += ".jpg";
+			
+			currentTokens[i].setIcon( new ImageIcon( getClass().getResource( path ) ) );
 		}
 		
 		//Updates Offboard Tokens
@@ -343,9 +360,16 @@ public class GamePanel extends JPanel implements ActionListener{
 			
 			Token temp = new Token(i, board.getTurn());
 			
-			if( getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ) != null ){
-				offBoardTokens[i].setIcon( new ImageIcon( getClass().getResource( "/icons/" + temp.getPathname() + ".jpg" ) ) );
+			String path = "/icons/" + temp.getPathname();
+			
+			if(board.reversedPieces()){
+				path += "_r";
 			}
+			
+			path += ".jpg";
+			
+			offBoardTokens[i].setIcon( new ImageIcon( getClass().getResource( path ) ) );
+		
 		}
 		
 	}

@@ -2,7 +2,9 @@
 
 package stratego;
 
-public class Tile {
+import java.io.Serializable;
+
+public class Tile implements Serializable{
 	private boolean passable;
 	private boolean inRange = false;
 	private Token token;
