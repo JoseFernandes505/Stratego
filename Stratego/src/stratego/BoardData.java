@@ -23,7 +23,8 @@ public class BoardData implements Serializable{
 	private boolean turn = false;
 	private boolean currentlySettingUp = true;
 	private boolean gameWon = false;
-	private boolean blueWon = false, redWon = false;
+	private boolean blueWon = false, redWon = false, totalDraw = false;
+	private boolean inBattle = false, betweenTurns = false;
 	
 	//Game Settings
 	private boolean reversedPieces = false;
@@ -47,14 +48,9 @@ public class BoardData implements Serializable{
 	 *  bombNum = 6
 	 * 
 	 */
-	private int[] initialNums = //{  1, 1, 8, 5,
-								//   4, 4, 4, 3,
-								//   2, 1, 1, 6  };
-	
-		{  1, 0, 1, 0,
-		   0, 0, 0, 0,
-		   0, 0, 1, 0
-		};
+	private int[] initialNums = {  1, 1, 8, 5,
+								   4, 4, 4, 3,
+								   2, 1, 1, 6  };
 			
 	/*
 	 * 
@@ -201,21 +197,7 @@ public class BoardData implements Serializable{
 		return false;
 	}
 	
-	public void doBattle( int defX, int defY ){
-		
-		int attX = -1, attY = -1;
-		
-		//Forloop to see which piece is the one that's currently moving
-		for(int i = 0; i < width; i++){
-			for(int j = 0; j< height; j++){
-				//If the piece has a token, and it is currently moving, then it is set to be the move token
-				if(getTile(i, j).getToken() != null && getTile(i, j).getToken().isMoving()){
-					attX = i;
-					attY = j;
-				}
-					
-			}
-		}
+	public void doBattle( int defX, int defY , int attX, int attY){
 		
 		//Checks that the from values were changed
 		if(attX == -1 && attY == -1) {
@@ -245,21 +227,22 @@ public class BoardData implements Serializable{
 	//Switches the turn
 	public void switchTurn(){
 		
-		boolean blueWin = false, redWin = false;
+		boolean blueWin = false, redWin = false, draw = false;
 		
 		if( !settingUp() ){
 			
 			blueWin = checkWinConditions( true );
 			redWin = checkWinConditions( false );
-			
+			draw = checkWinConditions();
 		}
 		
-		if(blueWin){
+		if(draw){
+			gameWon = true;
+			totalDraw = true;
+		} else if(blueWin){
 			gameWon = true;
 			blueWon = true;
-		}
-		
-		if(redWin){
+		} else if(redWin){
 			gameWon = true;
 			redWon = true;
 		}
@@ -339,6 +322,29 @@ public class BoardData implements Serializable{
 		return false;
 	}
 	
+	public boolean checkWinConditions(){
+		
+		boolean moveableLeft = false;
+		
+		for(int i = 0; i < getWidth(); i++){	
+			for(int j = 0; j < getHeight(); j++){
+				
+				if(getTile(i,j).getToken() != null ){					
+					if( getTile(i, j).getToken().getRange() > 0 ){
+						moveableLeft = true;						
+					}
+				}
+				
+			}
+		}
+		
+		if( !moveableLeft ){
+			return true;
+		}
+		
+		return false;
+	}
+	
 	/*
 	 * 
 	 * 		GETTERS/SETTERS
@@ -385,8 +391,32 @@ public class BoardData implements Serializable{
 		return redWon;
 	}
 	
+	public boolean draw(){
+		return totalDraw;
+	}
+	
 	public boolean reversedPieces(){
 		return reversedPieces;
+	}
+	
+	public void startBattling(){
+		inBattle = true;
+	}
+	
+	public void stopBattling(){
+		inBattle = false;
+	}
+	
+	public boolean battling(){
+		return inBattle;
+	}
+	
+	public void betweenTurns(boolean b){
+		betweenTurns = b;
+	}
+	
+	public boolean betweenTurns(){
+		return betweenTurns;
 	}
 	
 	public int getInitialRankTokens(int rank){

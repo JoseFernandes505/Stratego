@@ -2,6 +2,7 @@
 
 package stratego;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
@@ -41,12 +42,13 @@ public class Game implements ActionListener{
 	
 	//Board settings
 	private boolean reversePieces = false;
+	private Dimension frameSize = new Dimension(1100,1000);
 	
 	
 	public void Begin(){
 		//Creates a default frame for the operations to take place in
 		//(Main Menu, Settings, Game, Win/Lose Screens, etc)
-		f = new JFrame("Prarie Dog");	
+		f = new JFrame("Stratego");	
 		
 		//Creates the initial panel to populate the frame, the menu panel
 		mp = new MenuPanel( this );
@@ -73,8 +75,8 @@ public class Game implements ActionListener{
 		mBar.add(loadGameOption);
 		mBar.add(quitGameOption);
 					
-		//FIXME		
-		f.setSize( 1200, 1000); 
+		//Sets Frame up		
+		f.setSize( frameSize );
 		f.getContentPane().add( mp );
 		
 		//Sets frame properties
@@ -125,10 +127,28 @@ public class Game implements ActionListener{
 		//Reverses ranks within settings
 		} else if( source.equals( "Reversed Ranks" ) ){
 			reversePieces = true;
+		} else if( source.equals( "770 x 700" ) ){
+			frameSize = new Dimension(770,700);
+			f.setSize( frameSize );
+			
+			f.repaint();
+			f.revalidate();
+		} else if( source.equals( "1430 x 1300" ) ){
+			frameSize = new Dimension(1430,1300);
+			f.setSize( frameSize );
+			
+			f.repaint();
+			f.revalidate();
+		} else if( source.equals( "1100 x 1000" ) ){
+			frameSize = new Dimension(1100,1000);
+			f.setSize( frameSize );
+			
+			f.repaint();
+			f.revalidate();
 		//Returns to the main menu
 		//Settings -> Main Menu
 		//GamePanel -> Main Menu
-		} else if( source.equals( "Back To Main Menu" ) || source.equals( "Quit Game" ) ){
+		}else if( source.equals( "Back To Main Menu" ) || source.equals( "Quit Game" ) ){
 			mp = new MenuPanel( this );
 			
 			f.getContentPane().removeAll();
@@ -148,6 +168,11 @@ public class Game implements ActionListener{
 	//Returns whether the pieces are reversed
 	public boolean reversedPieces(){
 		return reversePieces;
+	}
+	
+	//Returns the dimension of the frame
+	public Dimension getSize(){
+		return frameSize;
 	}
 	
 	//Makes a popup to allow the user to save their game

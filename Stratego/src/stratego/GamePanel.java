@@ -43,12 +43,8 @@ public class GamePanel extends JPanel implements ActionListener{
 	private JPanel currentPieces;
 	//Shows the player's pieces at the beginning of the game
 	private JPanel offBoardPieces;
-	
-	private JLayeredPane layerPane;
 	//Token used when setting up board
 	private Token chosenToken;
-	//Checks if the board is being set up with the initial pieces
-	
 	//Stores the inital turn, to be used to know when setup is over
 	private boolean initialTurn;
 
@@ -238,7 +234,30 @@ public class GamePanel extends JPanel implements ActionListener{
 	
 	//Compares the two pieces 
 	public void doBattle(int defX, int defY){
-		board.doBattle(defX, defY);
+		int attX = -1, attY = -1;
+		//Forloop to see which piece is the one that's currently moving
+		for(int i = 0; i < board.getWidth(); i++){
+			for(int j = 0; j< board.getHeight(); j++){
+				//If the piece has a token, and it is currently moving, then it is set to be the move token
+				if(board.getTile(i, j).getToken() != null && board.getTile(i, j).getToken().isMoving()){
+					attX = i;
+					attY = j;
+				}
+					
+			}
+		}
+		
+		board.getTile(defX, defY).getToken().startMoving();
+		
+		board.startBattling();
+		
+		setAllIcons();
+		
+		battlePopup(attX, attY, defX, defY);		
+		
+		board.doBattle(defX, defY, attX, attY);
+		
+		board.stopBattling();
 		
 		clearBoardBackground();
 		setAllIcons();
@@ -248,6 +267,23 @@ public class GamePanel extends JPanel implements ActionListener{
 		board.switchTurn();
 		board.clearBoardData();
 		clearBoardBackground();
+		
+		
+		if( board.gameWon() ){
+			if( board.draw() ){
+				showDrawConfirmation();
+			} else if( board.blueWin() ){
+				showWinConfirmation(true);
+			} else if( board.redWin() ){
+				showWinConfirmation(false);
+			}
+		} else {
+			board.betweenTurns(true);
+			setAllIcons();
+			nextTurnPopup();
+			board.betweenTurns(false);
+		}
+		
 		setAllIcons();
 		updateDashboardButtons();
 		
@@ -270,16 +306,9 @@ public class GamePanel extends JPanel implements ActionListener{
 				board.switchSetup();
 			}
 		}
-		
-		if( board.gameWon() ){
-			if( board.blueWin() ){
-				showWinConfirmation(true);
-				
-			} else if( board.redWin() ){
-				showWinConfirmation(false);
-			}
-		}
 	}
+		
+		
 		
 	
 	/*
@@ -304,7 +333,8 @@ public class GamePanel extends JPanel implements ActionListener{
 				
 				//If the corresponding tile has a token
 				if( board.getTile(x, y).getToken() != null ){
-					if( board.getTile(x, y).getToken().getTeam() == board.getTurn() ){
+					if( 	!board.betweenTurns() && !board.battling() && board.getTile(x, y).getToken().getTeam() == board.getTurn() ||
+							!board.betweenTurns() && board.battling() && board.getTile(x, y).getToken().isMoving() ){
 						
 						//Gets the path for the imageicon
 						String path = "/icons/" + board.getTile(x, y).getToken().getPathname();
@@ -317,7 +347,9 @@ public class GamePanel extends JPanel implements ActionListener{
 						path +=  ".jpg";
 						
 						icon = new ImageIcon( getClass().getResource( path ) );
-					} else if( board.getTile(x, y).getToken().getTeam() != board.getTurn() ){
+					} else if( 	!board.betweenTurns() && !board.battling() && board.getTile(x, y).getToken().getTeam() != board.getTurn() ||
+								!board.betweenTurns() && board.battling() && !board.getTile(x, y).getToken().isMoving() ||
+								board.betweenTurns() ){
 						
 						//Creates an imageicon of the tile's team bg
 						icon = new ImageIcon( getClass().getResource( "/icons/" + board.getTile(x, y).getToken().getBgPathname() + ".jpg" ) );
@@ -518,6 +550,41 @@ public class GamePanel extends JPanel implements ActionListener{
 		
 		JOptionPane.showMessageDialog(this, "Congratulations " + teamName + " team! You have won!", teamName + " team Wins!", JOptionPane.PLAIN_MESSAGE);
 		
+	}
+	
+	public void showDrawConfirmation(){
+		
+		JOptionPane.showMessageDialog(this, "There has been a tie! Neither team wins!", "No team Wins!", JOptionPane.PLAIN_MESSAGE);
+		
+	}
+	
+	public void battlePopup(int attX, int attY, int defX, int defY){
+		
+		Token att = board.getTile(attX, attY).getToken();
+		Token def = board.getTile(defX, defY).getToken();
+		
+		String resultString = "";
+		String attTeam = ( att.getTeam() ? "Red" : "Blue");
+		String defTeam = ( def.getTeam() ? "Red" : "Blue");
+		int battleResult = att.doBattle(def);
+		
+		resultString += ( battleResult > 0 ? "The " + defTeam + " " + def.getRankName() + " was captured!" : "" );
+		resultString += ( battleResult < 0 ? "The " + attTeam + " " + att.getRankName() + " was captured!" : "" );
+		resultString += ( battleResult == 0 ? "Both pieces were captured!" : "" );
+		
+		JOptionPane.showMessageDialog(	this, 
+										"Battle!\n" + 
+										"The " + attTeam + " " + att.getRankName() + " ( " + att.getRank() + " ) " + 
+										"has attacked the " + defTeam + " " + def.getRankName() + " ( " + def.getRank() + " ) \n" +
+										resultString,
+										"Battle!",
+										JOptionPane.PLAIN_MESSAGE);
+		
+	}
+	
+	public void nextTurnPopup(){
+		String turn = (board.getTurn() ? "Red" : "Blue");
+		JOptionPane.showMessageDialog(this, "It is now " + turn + "'s turn. Please pass the computer." , "Switch turn", JOptionPane.PLAIN_MESSAGE);
 	}
 	
 }
