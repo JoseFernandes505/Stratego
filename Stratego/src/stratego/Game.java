@@ -4,11 +4,14 @@ package stratego;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import javax.swing.JFrame;
@@ -133,10 +136,11 @@ public class Game implements ActionListener{
 			
 			f.repaint();
 			f.validate();
+		//Returns the save game function
 		} else if( source.equals( "Save Game" ) ){
-			
 			saveGamePopup();
-			
+		} else if( source.equals( "Load Game" ) ){
+			loadGamePopup();
 		}
 		
 	}
@@ -155,48 +159,100 @@ public class Game implements ActionListener{
 			boolean exists = false;
 			boolean resultBool = true;
 			
+			//Asks for the file name
 			String fileName = JOptionPane.showInputDialog(	null,
 															"Please enter the name of your save file ",
 															"Save Game",
 															JOptionPane.INFORMATION_MESSAGE );
 			
+			//Gets the files in the directory and checks for conflict
 			File[] flist = f.listFiles();
-			
 			for( int i = 0; i < flist.length; i++ ){
-				System.out.println(  );
 				if( flist[i].getName().equals( fileName ) ){
 					exists = true;
 				}
 			}
 			
+			//If there is a conflict, asks confirmation for an overwrite
 			if( exists ){
 				int result = JOptionPane.showConfirmDialog(	null,
 															"This filename already exists. Do you want to continue?",
 															"File already exists!",
 															JOptionPane.YES_NO_OPTION);
 				resultBool = ( result == 0 ? true : false );
-				
-				System.out.println( result );
 			}
 			
+			//If the confirmation message is accepted or there is no conflict
 			if( resultBool ){
 				oos = new ObjectOutputStream( new BufferedOutputStream( new FileOutputStream( "./saves/" + fileName ) ) );
 				
 				oos.writeObject( board );
 				
 				oos.close();
-				
-				System.out.println("It did it lol");
+			}
+			
+		} catch(FileNotFoundException ex){
+			ex.printStackTrace();
+		} catch(IOException ex){
+			ex.printStackTrace();
+		}		
+	}
+	
+	//A popup that allows the user to load from a saved game
+	public void loadGamePopup(){
+		try{
+			ObjectInputStream ois;
+			String fileName = null;
+			File saveDir = new File("./saves");
+			
+			File[] saveFiles = saveDir.listFiles();
+			
+			Object[] saveFilesNames = new Object[ saveFiles.length ];
+			
+			for(int i = 0; i < saveFiles.length; i++){
+				saveFilesNames[i] = saveFiles[i].getName();
+			}
+			
+			if( saveFilesNames.length == 0 ){
+				JOptionPane.showConfirmDialog(	null,
+												"Uh oh! There are no current save files! Play a game and save!",
+												"No Save Files",
+												JOptionPane.DEFAULT_OPTION,
+												JOptionPane.PLAIN_MESSAGE);
+			} else {
+				fileName = (String) JOptionPane.showInputDialog(	null,
+																	"Choose which file to load from: ",
+																	"Loading File",
+																	JOptionPane.INFORMATION_MESSAGE,
+																	null,
+																	saveFilesNames,
+																	null);
 			}
 			
 			
-		}catch(FileNotFoundException ex){
+			if(fileName != null){
+				//Gets an inputstream from the filename
+				ois = new ObjectInputStream( new BufferedInputStream( new FileInputStream( "./saves/" + fileName ) ) );
+				
+				BoardData tempBoard = (BoardData) ois.readObject();
+				
+				bp = new GamePanel( tempBoard );
+				
+				f.getContentPane().removeAll();
+				f.setJMenuBar(mBar);
+				f.getContentPane().add( bp );
+				
+				f.repaint();
+				f.revalidate();
+			}
+			
+		} catch(FileNotFoundException ex){
 			ex.printStackTrace();
-		}catch(IOException ex){
+		} catch(IOException ex){
 			ex.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
-		
-		
 	}
 
 }

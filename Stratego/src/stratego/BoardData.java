@@ -255,13 +255,11 @@ public class BoardData implements Serializable{
 		}
 		
 		if(blueWin){
-			System.out.println("Blue wins!");
 			gameWon = true;
 			blueWon = true;
 		}
 		
 		if(redWin){
-			System.out.println("Red wins!");
 			gameWon = true;
 			redWon = true;
 		}

@@ -1,18 +1,15 @@
 package stratego;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -22,9 +19,6 @@ public class SettingsPanel extends JPanel{
 	private JPanel buttonsP;
 	
 	//Settings buttons
-	private JButton reverseB;
-	private JButton loadGameB;
-	private JButton settingsB;
 	private JButton menuB;
 	private ButtonGroup reverseGroup;
 	private JRadioButton reverseYB;
