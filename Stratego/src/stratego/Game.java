@@ -116,11 +116,13 @@ public class Game implements ActionListener{
 			f.getContentPane().removeAll();
 			f.getContentPane().add( sp );
 			
+			f.setJMenuBar( null );
+			
 			f.repaint();
 			f.revalidate();
 		//Exits the game
 		}  else if( source.equals( "Quit" ) ){
-				System.exit(0);
+			System.exit(0);
 		//Keeps the ranks in standard formation within settings
 		} else if( source.equals( "Standard Ranks" ) ){
 			reversePieces = false;
@@ -153,6 +155,8 @@ public class Game implements ActionListener{
 			
 			f.getContentPane().removeAll();
 			f.getContentPane().add( mp );
+			
+			f.setJMenuBar( null );
 			
 			f.repaint();
 			f.validate();
