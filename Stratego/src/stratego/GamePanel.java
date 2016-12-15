@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
@@ -117,6 +118,9 @@ public class GamePanel extends JPanel implements ActionListener{
 		for(int i = 0; i < offBoardTokens.length; i++){
 			offBoardTokens[i] = new JButton("" + i);
 			currentTokens[i] = new JButton("" + i);
+			
+			offBoardTokens[i].setMargin(new Insets(5,5,5,5));
+			currentTokens[i].setMargin(new Insets(5,5,5,5));
 			
 			offBoardTokens[i].addActionListener(this);
 			currentTokens[i].addActionListener(this);
@@ -371,9 +375,9 @@ public class GamePanel extends JPanel implements ActionListener{
 		
 		//Updates Current Tokens
 		for(int i = 0; i < currentTokens.length; i++){
-			currentTokens[i].setText( "x" + getNumTokens(i, board.getTurn()) );
-			
 			Token temp = new Token(i, board.getTurn());
+			
+			currentTokens[i].setText( "<html>" + temp.getRankName() + "<br> x " + getNumTokens(i, board.getTurn()) + "</html>" );
 			
 			String path = "/icons/" + temp.getPathname();
 			
@@ -388,9 +392,9 @@ public class GamePanel extends JPanel implements ActionListener{
 		
 		//Updates Offboard Tokens
 		for(int i = 0; i < offBoardTokens.length; i++){
-			offBoardTokens[i].setText( "x" + (board.getInitialRankTokens(i) - getNumTokens(i, board.getTurn())) );
-			
 			Token temp = new Token(i, board.getTurn());
+			
+			offBoardTokens[i].setText( "<html>" + temp.getRankName() + "<br> x " + (board.getInitialRankTokens(i) - getNumTokens(i, board.getTurn())) + "</html>");
 			
 			String path = "/icons/" + temp.getPathname();
 			

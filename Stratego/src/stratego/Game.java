@@ -228,13 +228,13 @@ public class Game implements ActionListener{
 		try{
 			ObjectInputStream ois;
 			String fileName = null;
-			File saveDir = new File("./saves");
+			File saveDir = new File( "./saves" );
 			
 			File[] saveFiles = saveDir.listFiles();
 			
-			Object[] saveFilesNames = new Object[ saveFiles.length ];
+			String[] saveFilesNames = new String[ saveFiles.length ];
 			
-			for(int i = 0; i < saveFiles.length; i++){
+			for(int i = 0; i < saveFilesNames.length; i++){
 				saveFilesNames[i] = saveFiles[i].getName();
 			}
 			
@@ -257,7 +257,7 @@ public class Game implements ActionListener{
 			
 			if(fileName != null){
 				//Gets an inputstream from the filename
-				ois = new ObjectInputStream( new BufferedInputStream( new FileInputStream( "./saves/" + fileName ) ) );
+				ois = new ObjectInputStream( new BufferedInputStream( new FileInputStream( "./saves/" + fileName) ) );
 				
 				BoardData tempBoard = (BoardData) ois.readObject();
 				
@@ -272,10 +272,13 @@ public class Game implements ActionListener{
 			}
 			
 		} catch(FileNotFoundException ex){
+			JOptionPane.showConfirmDialog(null, "Messed Up Case 1", "pls", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 			ex.printStackTrace();
 		} catch(IOException ex){
+			JOptionPane.showConfirmDialog(null, "Messed Up Case 2", "pls", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 			ex.printStackTrace();
 		} catch (ClassNotFoundException e) {
+			JOptionPane.showConfirmDialog(null, "Messed Up Case 3", "pls", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 			e.printStackTrace();
 		}
 	}
