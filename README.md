@@ -1,6 +1,7 @@
 # Stratego
 
 COP 3252 - Stratego - Jose Fernandes
+
 This game was created as an assignment for "Internet Programming With Java", entirely in, as might be a little obvious, Java
 
 ## Important Run Information
