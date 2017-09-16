@@ -1,5 +1,4 @@
 //Created by Jose Fernandes
-
 package stratego;
 
 import java.io.Serializable;

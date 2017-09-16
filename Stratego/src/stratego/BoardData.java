@@ -1,5 +1,4 @@
 //Created by Jose Fernandes
-
 package stratego;
 
 import java.io.Serializable;
@@ -51,7 +50,6 @@ public class BoardData implements Serializable{
 	private int[] initialNums = {  1, 1, 8, 5,
 								   4, 4, 4, 3,
 								   2, 1, 1, 6  };
-			
 	/*
 	 * 
 	 * 		CONSTRUCTOR & INITIALIZER FUNCTION
@@ -230,12 +228,13 @@ public class BoardData implements Serializable{
 		boolean blueWin = false, redWin = false, draw = false;
 		
 		if( !settingUp() ){
-			
+			//Checks to see if anyone has won yet
 			blueWin = checkWinConditions( true );
 			redWin = checkWinConditions( false );
 			draw = checkWinConditions();
 		}
 		
+		//If so, sets the board as won
 		if(draw){
 			gameWon = true;
 			totalDraw = true;
@@ -247,10 +246,10 @@ public class BoardData implements Serializable{
 			redWon = true;
 		}
 		
-		if(!redWin && !blueWin){
+		//If no win, keeps going
+		if(!gameWon){
 			turn = !turn;
 		}
-				
 	}
 	
 	//Adds a new token to the board at the specified location
@@ -295,6 +294,7 @@ public class BoardData implements Serializable{
 		}
 	}
 	
+	//Checks if one specific team has won
 	public boolean checkWinConditions(boolean team){
 		
 		boolean moveableLeft = false, flagLeft = false;
@@ -303,10 +303,11 @@ public class BoardData implements Serializable{
 			for(int j = 0; j < getHeight(); j++){
 				
 				if(getTile(i,j).getToken() != null && getTile(i, j).getToken().getTeam() == team ){					
-					if( getTile(i, j).getToken().getRange() > 0 ){
+					//Checks if any pieces are able to move
+					if( getTile(i, j).getToken().getRange() > 0 && checkIfMobile( i , j ) ){
 						moveableLeft = true;						
 					}
-					
+					//Checks if the flag is still there
 					if( getTile(i, j).getToken().getRank() == 0 ){
 						flagLeft = true;						
 					}
@@ -314,7 +315,7 @@ public class BoardData implements Serializable{
 				
 			}
 		}
-		
+		//If either isn't true, then the game is over
 		if( !moveableLeft || !flagLeft ){
 			return true;
 		}
@@ -322,15 +323,16 @@ public class BoardData implements Serializable{
 		return false;
 	}
 	
+	//Checks to see if there has been a draw based on immobility
 	public boolean checkWinConditions(){
 		
 		boolean moveableLeft = false;
 		
 		for(int i = 0; i < getWidth(); i++){	
 			for(int j = 0; j < getHeight(); j++){
-				
+				//Checks if any pieces are able to move
 				if(getTile(i,j).getToken() != null ){					
-					if( getTile(i, j).getToken().getRange() > 0 ){
+					if( getTile(i, j).getToken().getRange() > 0 && checkIfMobile( i , j ) ){
 						moveableLeft = true;						
 					}
 				}
@@ -343,6 +345,42 @@ public class BoardData implements Serializable{
 		}
 		
 		return false;
+	}
+	
+	//Checks if the token at this position is able to move (not just by range, but whether there's stuff in the way)
+	public boolean checkIfMobile(int x, int y){
+		
+		boolean canMove = false;
+		
+		//Checks tile to the right
+		if(x < (width - 1) ){
+			if( getTile(x + 1, y).isPassable() && getTile(x + 1, y).getToken() == null) {
+				canMove = true;
+			}
+		}
+		
+		//Checks tile to the left
+		if(x > 0 ){
+			if( getTile(x - 1, y).isPassable() && getTile(x - 1, y).getToken() == null) {
+				canMove = true;
+			}
+		}
+		
+		//Checks tile below
+		if(y < (height - 1) ){
+			if( getTile(x, y + 1).isPassable() && getTile(x, y + 1).getToken() == null) {
+				canMove = true;
+			}
+		}
+		
+		//Checks tile above
+		if(y < 0 ){
+			if( getTile(x, y - 1).isPassable() && getTile(x, y - 1).getToken() == null) {
+				canMove = true;
+			}
+		}
+		
+		return canMove;
 	}
 	
 	/*
@@ -371,54 +409,68 @@ public class BoardData implements Serializable{
 		return turn;
 	}
 	
+	//Checks if the board is in the setup state
 	public boolean settingUp(){
 		return currentlySettingUp;
 	}
 	
+	//Switches the setup state
 	public void switchSetup(){
 		currentlySettingUp = !currentlySettingUp;
 	}
 	
+	//Checks if the board is in the won state
 	public boolean gameWon(){
 		return gameWon;
 	}
 	
+	//Checks if the blue win state
 	public boolean blueWin(){
 		return blueWon;
 	}
 	
+	//Checks if the red win state
 	public boolean redWin(){
 		return redWon;
 	}
 	
+	//Checks if there is a draw state
 	public boolean draw(){
 		return totalDraw;
 	}
 	
+	//Checks if there board is reversed
 	public boolean reversedPieces(){
 		return reversedPieces;
 	}
 	
+	//Starts the battle state
 	public void startBattling(){
 		inBattle = true;
 	}
 	
+	//Ends the battle state
 	public void stopBattling(){
 		inBattle = false;
 	}
 	
+	//Checks the battle state
 	public boolean battling(){
 		return inBattle;
 	}
 	
+	//Sets between turns
 	public void betweenTurns(boolean b){
 		betweenTurns = b;
 	}
 	
+	//Checks if between turns
 	public boolean betweenTurns(){
 		return betweenTurns;
 	}
 	
+	//Checks the initial tokens array to see how many of each there
+	//were initially
 	public int getInitialRankTokens(int rank){
 		return initialNums[rank];
 	}

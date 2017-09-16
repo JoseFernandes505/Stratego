@@ -1,6 +1,6 @@
 //Created by Jose Fernandes
-
 package stratego;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -80,11 +80,6 @@ public class GamePanel extends JPanel implements ActionListener{
 			for(int j = 0; j < tileButtons[i].length; j++){
 				//Sets the button's color to be based on the 
 				tileButtons[i][j] = new JButton();
-				if( board.getTile(i,j).isPassable() ){
-					tileButtons[i][j].setBackground( grassColor );
-				} else if ( !board.getTile(i,j).isPassable() ){
-					tileButtons[i][j].setBackground( waterColor );
-				}
 				
 				//Adds an action listener to the button
 				tileButtons[i][j].addActionListener( this );
@@ -119,8 +114,8 @@ public class GamePanel extends JPanel implements ActionListener{
 			offBoardTokens[i] = new JButton("" + i);
 			currentTokens[i] = new JButton("" + i);
 			
-			offBoardTokens[i].setMargin(new Insets(5,5,5,5));
-			currentTokens[i].setMargin(new Insets(5,5,5,5));
+			offBoardTokens[i].setMargin(new Insets(1,1,1,1));
+			currentTokens[i].setMargin(new Insets(1,1,1,1));
 			
 			offBoardTokens[i].addActionListener(this);
 			currentTokens[i].addActionListener(this);
@@ -267,12 +262,15 @@ public class GamePanel extends JPanel implements ActionListener{
 		setAllIcons();
 	}
 	
+	//Switches the turn representation
 	public void switchTurn(){
+		//Switches the board on the actual level
 		board.switchTurn();
+		//Clears any leftover states
 		board.clearBoardData();
 		clearBoardBackground();
 		
-		
+		//Checks if the game has been won
 		if( board.gameWon() ){
 			if( board.draw() ){
 				showDrawConfirmation();
@@ -281,16 +279,18 @@ public class GamePanel extends JPanel implements ActionListener{
 			} else if( board.redWin() ){
 				showWinConfirmation(false);
 			}
+		//Sets up the switch turn notification
 		} else {
 			board.betweenTurns(true);
 			setAllIcons();
 			nextTurnPopup();
 			board.betweenTurns(false);
 		}
-		
+		//Redraws the icons after switch turn
 		setAllIcons();
 		updateDashboardButtons();
 		
+		//If the board is done setting up, switches out of the setup mode
 		if( board.settingUp() ){
 			if(board.getTurn() == initialTurn){
 				
@@ -310,6 +310,8 @@ public class GamePanel extends JPanel implements ActionListener{
 				board.switchSetup();
 			}
 		}
+		
+		setAllIcons();
 	}
 		
 		
@@ -323,6 +325,8 @@ public class GamePanel extends JPanel implements ActionListener{
 	
 	//Sets the icons of the board to be the appropriate icons
 	public void setAllIcons(){
+		
+		setTileBackgrounds();
 		
 		//Forloop to draw the piece's icons
 		for(int i = 0; i < tileButtons.length; i++){
@@ -367,7 +371,50 @@ public class GamePanel extends JPanel implements ActionListener{
 			}
 		}
 		
+	}
+	
+	//Sets up the tile backgrounds
+	public void setTileBackgrounds(){
 		
+		//Sets up the normal board 
+		for(int i = 0; i < tileButtons.length; i++){
+			for(int j = 0; j < tileButtons[i].length; j++){
+				
+				if( board.getTile(i,j).isPassable() ){
+					tileButtons[i][j].setBackground( (board.settingUp() ? new Color(150,0,0) : grassColor ) );
+				} else if( !board.getTile(i,j).isPassable() ){
+					tileButtons[i][j].setBackground( waterColor );
+				}
+				
+			}
+		}
+		
+		//Highlights working area if setting up
+		if( board.settingUp() ){
+			
+			if( board.getTurn() ){
+				//highlights for the Red team
+				for(int i = 0; i < 4; i++){
+					for(int j = 0; j < tileButtons[i].length; j++){
+						
+						tileButtons[i][j].setBackground( grassColor );
+						
+					}
+				}
+				
+			} else {
+				//Highlights for the Blue team
+				for(int i = board.getWidth() - 1; i > 5; i--){
+					for(int j = 0; j < tileButtons[i].length; j++){
+						
+						tileButtons[i][j].setBackground( grassColor );
+						
+					}
+				}
+				
+			}
+			
+		}
 		
 	}
 	

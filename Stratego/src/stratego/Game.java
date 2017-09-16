@@ -1,5 +1,4 @@
 //Created by Jose Fernandes
-
 package stratego;
 
 import java.awt.Dimension;
@@ -84,8 +83,6 @@ public class Game implements ActionListener{
 		f.setResizable( false );
 	    f.setVisible( true );
 	    f.setLocationRelativeTo(null); 
-	    
-		
 		
 	}
 
@@ -100,24 +97,29 @@ public class Game implements ActionListener{
 		
 		//If from Main Menu -> Start Game
 		if( source.equals( "Start Game" ) ){
+			//Creates a new board data and panel objects
 			board = new BoardData( reversePieces );
 			bp = new GamePanel(board);
 			
+			//Clears the frame, sets the jmenubar, and adds the board
 			f.getContentPane().removeAll();
 			f.setJMenuBar(mBar);
 			f.getContentPane().add( bp );
 			
+			//Repaints the frame with the board on it
 			f.repaint();
 			f.revalidate();
 		//If from Main Menu -> Settings
 		} else if( source.equals( "Settings" ) ){
+			//Creates new settings panel
 			sp = new SettingsPanel( this );
 			
+			//Clears the frame, removes the jmenubar, and adds the panel
 			f.getContentPane().removeAll();
+			f.setJMenuBar( null );
 			f.getContentPane().add( sp );
 			
-			f.setJMenuBar( null );
-			
+			//Repaints the frame with the panel on it
 			f.repaint();
 			f.revalidate();
 		//Exits the game
@@ -130,39 +132,48 @@ public class Game implements ActionListener{
 		} else if( source.equals( "Reversed Ranks" ) ){
 			reversePieces = true;
 		} else if( source.equals( "770 x 700" ) ){
+			//Changes the dimension variable and sets the size to it
 			frameSize = new Dimension(770,700);
 			f.setSize( frameSize );
 			
+			//Repaints and revalidates the frame
 			f.repaint();
 			f.revalidate();
 		} else if( source.equals( "1430 x 1300" ) ){
+			//Changes the dimension variable and sets the size to it
 			frameSize = new Dimension(1430,1300);
 			f.setSize( frameSize );
 			
+			//Repaints and revalidates the frame
 			f.repaint();
 			f.revalidate();
 		} else if( source.equals( "1100 x 1000" ) ){
+			//Changes the dimension variable and sets the size to it
 			frameSize = new Dimension(1100,1000);
 			f.setSize( frameSize );
 			
+			//Repaints and revalidates the frame
 			f.repaint();
 			f.revalidate();
 		//Returns to the main menu
 		//Settings -> Main Menu
 		//GamePanel -> Main Menu
 		}else if( source.equals( "Back To Main Menu" ) || source.equals( "Quit Game" ) ){
+			//Creates new main menu panel
 			mp = new MenuPanel( this );
 			
+			//Clears the frame, removes the jmenubar, and adds the panel
 			f.getContentPane().removeAll();
+			f.setJMenuBar( null );
 			f.getContentPane().add( mp );
 			
-			f.setJMenuBar( null );
-			
+			//Repaints the frame with the panel on it
 			f.repaint();
 			f.validate();
 		//Returns the save game function
 		} else if( source.equals( "Save Game" ) ){
 			saveGamePopup();
+		//Returns the load game function
 		} else if( source.equals( "Load Game" ) ){
 			loadGamePopup();
 		}
@@ -183,6 +194,7 @@ public class Game implements ActionListener{
 	public void saveGamePopup(){
 		
 		try{			
+			//Makes an outputstream to save the board with
 			ObjectOutputStream oos;
 			File f = new File("./saves");
 			boolean exists = false;
@@ -230,24 +242,29 @@ public class Game implements ActionListener{
 	//A popup that allows the user to load from a saved game
 	public void loadGamePopup(){
 		try{
+			//Asks for an input stream to take the serialized object
 			ObjectInputStream ois;
 			String fileName = null;
 			File saveDir = new File( "./saves" );
 			
+			//An array of all the files within the save directory
 			File[] saveFiles = saveDir.listFiles();
 			
+			//The names of those files
 			String[] saveFilesNames = new String[ saveFiles.length ];
 			
 			for(int i = 0; i < saveFilesNames.length; i++){
 				saveFilesNames[i] = saveFiles[i].getName();
 			}
 			
+			//If the user tries to load with no saves in the folder
 			if( saveFilesNames.length == 0 ){
 				JOptionPane.showConfirmDialog(	null,
 												"Uh oh! There are no current save files! Play a game and save!",
 												"No Save Files",
 												JOptionPane.DEFAULT_OPTION,
 												JOptionPane.PLAIN_MESSAGE);
+			//If there are files within the folder
 			} else {
 				fileName = (String) JOptionPane.showInputDialog(	null,
 																	"Choose which file to load from: ",
@@ -263,26 +280,30 @@ public class Game implements ActionListener{
 				//Gets an inputstream from the filename
 				ois = new ObjectInputStream( new BufferedInputStream( new FileInputStream( "./saves/" + fileName) ) );
 				
+				//Makes a new board from the serialized object
 				BoardData tempBoard = (BoardData) ois.readObject();
-				
+				//Sets up a panel with this board
 				bp = new GamePanel( tempBoard );
 				
+				//Sets the JMenubar and clears the frame to put the board on it
 				f.getContentPane().removeAll();
 				f.setJMenuBar(mBar);
 				f.getContentPane().add( bp );
 				
+				//Repaints and revalidates for the new board
 				f.repaint();
 				f.revalidate();
 			}
 			
 		} catch(FileNotFoundException ex){
-			JOptionPane.showConfirmDialog(null, "Messed Up Case 1", "pls", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+			//JOptionPane.showConfirmDialog(null, "Messed Up Case 1", "pls", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 			ex.printStackTrace();
 		} catch(IOException ex){
-			JOptionPane.showConfirmDialog(null, "Messed Up Case 2", "pls", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+			//JOptionPane.showConfirmDialog(null, "Messed Up Case 2", "pls", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 			ex.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			JOptionPane.showConfirmDialog(null, "Messed Up Case 3", "pls", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+			//If there is a mismatch between the serialized object and the current board type
+			JOptionPane.showConfirmDialog(null, "The Save and the Board seem to have mismatched versions!", "Mismatched Versions!", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
 			e.printStackTrace();
 		}
 	}

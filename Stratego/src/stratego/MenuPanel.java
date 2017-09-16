@@ -1,5 +1,6 @@
 //Jose Fernandes
-package stratego;
+package stratego; 
+
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
