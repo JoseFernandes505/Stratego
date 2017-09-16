@@ -50,8 +50,13 @@ There are two ranking types in Stratego that are commonly used, which in this ap
 
 ## Extra Features
 Many of these have already been mentioned, either extensively or in passing, but here they are in list format:
-	-Save/Load functionality
-	-Ability to switch between Standard and Reversed rankings
-	-Option to resize between 3 different frame sizes
-	-Dashboard with current and captured pieces
-	-Color coded setup area
+
+   -Save/Load functionality
+
+   -Ability to switch between Standard and Reversed rankings
+
+   -Option to resize between 3 different frame sizes
+
+   -Dashboard with current and captured pieces
+
+   -Color coded setup area
